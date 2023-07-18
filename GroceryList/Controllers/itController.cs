@@ -7,6 +7,7 @@ using System.Linq;
 using X.PagedList;
 using X.PagedList.Mvc.Core;
 using X.PagedList.Web.Common;
+using Microsoft.EntityFrameworkCore;
 
 namespace GroceryList.Controllers
 {
@@ -31,18 +32,19 @@ namespace GroceryList.Controllers
             c.SaveChanges();
             return RedirectToAction("Index");
         }
-        public IActionResult DeleteItem(int id)
+        
+        public IActionResult DeleteItem(int Id)
 
         {
-            var it = c.Items.Find(id);
+            var it = c.Items.Find(Id);
             it.IsDeleted = true;
             c.SaveChanges();
             return RedirectToAction("Index");
         }
         [HttpGet]
-        public IActionResult EditItem(int id)
+        public IActionResult EditItem(int Id)
         {
-            var item = c.Items.FirstOrDefault(x => x.Id == id);
+            var item = c.Items.FirstOrDefault(x => x.Id == Id);
             if (item != null)
             {
                 item.IsEditing = true;

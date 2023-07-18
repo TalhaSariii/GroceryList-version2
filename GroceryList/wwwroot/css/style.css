@@ -17,12 +17,10 @@ html {
 }
 
 .table-t {
-    border-collapse: collapse;
-    width: 100%;
     max-width: 800px;
-    background-color: honeydew;
+    background-color: #f1dfca;
     table-layout: fixed;
-    border: 1px solid black; 
+    border: 1px solid black;
 }
 
     .table-t td,
@@ -30,14 +28,16 @@ html {
         padding: 8px;
         text-align: left;
         max-width: 150px;
-        white-space: normal;
-        text-overflow: ellipsis;
-        border: 1px solid black; 
+        white-space: nowrap; 
+        overflow: hidden; 
+        text-overflow: ellipsis; 
+        border: 1px solid black;
     }
+
         .table-t td input {
             width: 100%;
             box-sizing: border-box;
-            background-color: honeydew;
+            background-color: #f1dfca;
         }
 
 .fixed-header {
@@ -72,15 +72,14 @@ body {
     margin-right: 20px;
 }
 .inactive-row {
-    background-color: gray;
-    opacity:70%;
+    background-color: #67635c;
+    opacity: 70%;
 }
 .pull-right{
     
 margin-left:70px;
 
 }
-
 
 
 
