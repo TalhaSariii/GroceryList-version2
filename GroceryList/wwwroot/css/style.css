@@ -1,0 +1,88 @@
+html {
+    font-size: 14px;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+.table-c {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+   
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+
+.table-t {
+    border-collapse: collapse;
+    width: 100%;
+    max-width: 800px;
+    background-color: honeydew;
+    table-layout: fixed;
+    border: 1px solid black; 
+}
+
+    .table-t td,
+    .table-t th {
+        padding: 8px;
+        text-align: left;
+        max-width: 150px;
+        white-space: normal;
+        text-overflow: ellipsis;
+        border: 1px solid black; 
+    }
+        .table-t td input {
+            width: 100%;
+            box-sizing: border-box;
+            background-color: honeydew;
+        }
+
+.fixed-header {
+    position: sticky;
+    top: 0;
+    background-color: paleturquoise;
+    z-index: 1;
+}
+
+
+
+.date-font {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+body {
+    font-family: "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.table-t td.actions-cell {
+    white-space: nowrap;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-around;
+    align-items: center;
+}
+.swal2-confirm {
+    margin-left: 20px;
+}
+
+.swal2-cancel {
+    margin-right: 20px;
+}
+.inactive-row {
+    background-color: gray;
+    opacity:70%;
+}
+.pull-right{
+    
+margin-left:70px;
+
+}
+
+
+
+
+
+

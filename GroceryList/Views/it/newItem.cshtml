@@ -1,0 +1,35 @@
+﻿@model GroceryList.Models.Item
+
+@{
+    ViewData["Title"] = "newItem";
+    Layout = "~/Views/Shared/_TestLayout.cshtml";
+}
+
+<style>
+    .form-container {
+        margin: 0 auto;
+        max-width: 400px;
+    }
+</style>
+
+<div class="form-container">
+    <form class="from-group" method="post">
+        <b>Name</b>
+        @Html.TextBoxFor(x => x.Name, new { @class = "form-control" })
+        <br />
+        <b>Type</b>
+        @Html.TextBoxFor(x => x.Type, new { @class = "form-control" })
+        <br />
+        <b>Amount</b>
+        @Html.TextBoxFor(x => x.Amount, new { @class = "form-control" })
+        <br />
+        <b>Price</b>
+        @Html.TextBoxFor(x => x.Price, new { @class = "form-control" })
+        <br />
+        <b>ShopName</b>
+        @Html.TextBoxFor(x => x.ShopName, new { @class = "form-control" })
+        <br />
+
+        <button class="btn btn-primary">Add</button>
+    </form>
+</div>

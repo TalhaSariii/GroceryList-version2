@@ -1,0 +1,179 @@
+﻿@using GroceryList.Models
+@using X.PagedList
+@using X.PagedList.Mvc.Core
+@using X.PagedList.Web.Common
+@model IPagedList<Item>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_TestLayout.cshtml";
+}
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.2/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+
+
+<div class="container p-5 bg-primary text-white text-center">
+    <h1>Grocery List</h1>
+</div>
+
+<div class="table-c">
+    <table class="table-t">
+        <tr>
+            <th class="fixed-header">Creation Date</th>
+            <th class="fixed-header">Modified Date</th>
+            <th class="fixed-header">Name</th>
+            <th class="fixed-header">Type</th>
+            <th class="fixed-header">Amount</th>
+            <th class="fixed-header">Price</th>
+            <th class="fixed-header">Shop Name</th>
+            <th class="fixed-header">Is Active?</th>
+            <th class="fixed-header">Actions</th>
+        </tr>
+        @foreach (var Item in Model)
+        {
+            <tr class="@(!Item.IsActive ? "inactive-row" : "")">
+                <td class="date-font">@Item.CreateDate.ToString("dd.MM.yyyy hh:mm")</td>
+                <td class="date-font">@Item.ModifiedDate.ToString("dd.MM.yyyy hh:mm")</td>
+                <td>@Item.Name</td>
+                <td>@Item.Type</td>
+                <td>@Item.Amount</td>
+                <td>@Item.Price</td>
+                <td>@Item.ShopName</td>
+                <td>
+                    <input type="checkbox" disabled id="isActiveCheckbox_@Item.Id" @(Item.IsActive ? "checked" : "") />
+                </td>
+                <td class="actions-cell">
+                    <div class="actions-wrapper">
+                        <div class="delete-edit-wrapper">
+                            <a href="/it/DeleteItem/@Item.Id" class="btn btn-outline-danger delete-link">Delete</a>
+                        </div>
+                        <div class="delete-edit-wrapper">
+                            <a href="/it/EditItem/@Item.Id" class="btn btn-outline-warning edit-link">Edit</a>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            @if (Item.IsEditing)
+            {
+                <form method="post" action="/it/EditItem">
+                    @Html.Hidden("Id", Item.Id)
+                <tr>
+                    <td class="date-font">@Item.CreateDate.ToString("dd.MM.yyyy")</td>
+                    <td class="date-font">@Item.ModifiedDate.ToString("dd.MM.yyyy")</td>
+                    <td><input type="text" name="Name" value="@Item.Name" /></td>
+                    <td><input type="text" name="Type" value="@Item.Type" /></td>
+                    <td><input type="number" name="Amount" value="@Item.Amount" /></td>
+                    <td><input type="number" name="Price" value="@Item.Price" /></td>
+                    <td><input type="text" name="ShopName" value="@Item.ShopName" /></td>
+                    <td>
+                        <input type="checkbox" id="isActiveCheckboxEdit_@Item.Id" name="IsActive" @(Item.IsActive ? "checked" : "") />
+                    </td>
+                    <td>
+                        <input type="submit" value="Save" class="btn btn-outline-success" />
+                        <input type="button" value="Cancel" class="btn btn-outline-danger" onclick="cancelEdit()" />
+                    </td>
+                </tr>
+                </form>
+            }
+        }
+        <tr>
+            <td class="td-add" colspan="2">
+                <a href="/it/newitem/" id="add" class="btn btn-primary">Add</a>
+            </td>
+                <td colspan="7" align="center"><div class="pull-right">
+                    @Html.PagedListPager((IPagedList)Model, page => Url.Action("Index", new{page}),
+                    new PagedListRenderOptions
+                    {
+                    LiElementClasses = new string[] { "page-item" },
+                    PageClasses = new string[] { "page-link" },
+                    Display = PagedListDisplayMode.IfNeeded
+
+                    })
+                </div>
+
+                </td>
+
+            
+        </tr>
+    </table>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const deleteLinks = document.querySelectorAll(".delete-link");
+        deleteLinks.forEach(function (link) {
+            link.addEventListener("click", function (event) {
+                event.preventDefault();
+                const deleteUrl = this.getAttribute("href");
+                const swalWithBootstrapButtons = Swal.mixin({
+                    customClass: {
+                        confirmButton: 'btn btn-success',
+                        cancelButton: 'btn btn-danger'
+                    },
+                    buttonsStyling: false
+                });
+                swalWithBootstrapButtons.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, delete it!',
+                    cancelButtonText: 'No, cancel!',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        swalWithBootstrapButtons.fire(
+                            'Deleted!',
+                            'Your file has been deleted.',
+                            'success'
+                        );
+                        deleteItem(deleteUrl);
+                    } else if (result.dismiss === Swal.DismissReason.cancel) {
+                        swalWithBootstrapButtons.fire(
+                            'Cancelled',
+                            'Your file is safe :)',
+                            'error'
+                        );
+                    }
+                });
+            });
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+         
+            const tableRows = document.querySelectorAll("tr");
+            tableRows.forEach(function (row) {
+                const isActiveCheckbox = row.querySelector("input[type='checkbox'][disabled]");
+                if (isActiveCheckbox && !isActiveCheckbox.checked) {
+                    row.classList.add("inactive-row");
+                }
+            });
+        });
+
+        function deleteItem(deleteUrl) {
+            fetch(deleteUrl, {
+                method: 'POST'
+            })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.reload();
+                    } else {
+                        throw new Error('Deletion failed.');
+                    }
+                })
+                .catch(error => {
+                    console.error(error);
+                    swalWithBootstrapButtons.fire(
+                        'Error',
+                        'An error occurred during the deletion process.',
+                        'error'
+                    );
+                });
+        }
+
+        function cancelEdit() {
+            window.location.reload();
+        }
+    });
+</script>
