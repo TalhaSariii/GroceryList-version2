@@ -28,31 +28,67 @@
             <th class="fixed-header">Price</th>
             <th class="fixed-header">Shop Name</th>
             <th class="fixed-header">Is Active?</th>
-            <th class="fixed-header">Actions</th>
+            <th class="fixed-header">Edit</th>
+            <th class="fixed-header">Delete</th>
+         
+
         </tr>
         @foreach (var Item in Model)
         {
             <tr class="@(!Item.IsActive ? "inactive-row" : "")">
                 <td class="date-font">@Item.CreateDate.ToString("dd.MM.yyyy hh:mm")</td>
                 <td class="date-font">@Item.ModifiedDate.ToString("dd.MM.yyyy hh:mm")</td>
-                <td>@Item.Name</td>
+                <td>
+                    @{
+                        if (@Item.Name.Length > 8)
+                        {
+                            <div class="tippp">
+                                @Item.Name.Substring(0,8)
+                    <span class="tooltiptext">@Item.Name</span>
+                            </div>
+                        }
+                        else
+                        {
+                            @Item.Name
+                        }
+                    }
+               
+                </td>
                 <td>@Item.Type</td>
                 <td>@Item.Amount</td>
                 <td>@Item.Price</td>
-                <td>@Item.ShopName</td>
+                <td>
+                @{
+                    if (@Item.ShopName.Length > 8)
+                    {
+                        <div class="tippp">
+                        @Item.ShopName.Substring(0, 8)
+                        <span class="tooltiptext">@Item.ShopName</span>
+                        </div>
+                    } else
+                    {
+
+                        @Item.ShopName
+                    }
+                 
+                }
+                </td>
                 <td>
                     <input type="checkbox" disabled id="isActiveCheckbox_@Item.Id" @(Item.IsActive ? "checked" : "") />
-                </td>
+                </td >
                 <td class="actions-cell">
-                    <div class="actions-wrapper">
-                        <div class="delete-edit-wrapper">
-                            <a href="/it/DeleteItem/@Item.Id" class="btn btn-outline-danger delete-link" style="background-color: #c75239; color: white;">Delete</a>
 
-                        </div>
-                        <div class="delete-edit-wrapper">
-                            <a href="/it/EditItem/@Item.Id" class="btn btn-outline-warning edit-link">Edit</a>
-                        </div>
+                    <div class="edit-wrapper">
+                        <a href="/it/EditItem/@Item.Id" class="btn btn-warning edit-link" style=" background-color:#ffca3a; color: white;">Edit</a>
                     </div>
+                </td>
+                    <td>
+                       
+                    <div class="delete-wrapper">
+                        <a href="/it/DeleteItem/@Item.Id" class="btn btn-danger delete-link" style=" background-color:#ff595e; color: white;">Delete</a>
+
+                    </div>
+                    
                 </td>
             </tr>
             @if (Item.IsEditing)
@@ -71,36 +107,59 @@
                         <input type="checkbox" id="isActiveCheckboxEdit_@Item.Id" name="IsActive" @(Item.IsActive ? "checked" : "") />
                     </td>
                     <td>
-                        <input type="submit" value="Save" class="btn btn-outline-success" />
-                        <input type="button" value="Cancel" class="btn btn-outline-danger" onclick="cancelEdit()" />
+                        <input type="submit" value="Save" class="btn btn-success" style=" background-color:#8ac926; color: white;" />
+                       
+                    </td>
+                    <td>
+                        <input type="button" value="Cancel" class="btn btn-danger" style=" background-color:#ff595e; color: white;" onclick="cancelEdit()" />
                     </td>
                 </tr>
                 </form>
             }
         }
-        <tr>
-            <td class="td-add" colspan="2">
-                <a href="/it/newitem/" id="add" class="btn btn-primary">Add</a>
-            </td>
-                <td colspan="7" align="center"><div class="pull-right">
-                    @Html.PagedListPager((IPagedList)Model, page => Url.Action("Index", new{page}),
-                    new PagedListRenderOptions
-                    {
-                    LiElementClasses = new string[] { "page-item" },
-                    PageClasses = new string[] { "page-link" },
-                    Display = PagedListDisplayMode.IfNeeded
-
-                    })
-                </div>
-
-                </td>
-
-            
-        </tr>
+   
     </table>
+  
 </div>
+<div class="container">
+ <div class="row">
+    <div class="col-4">
+    
+        <a href="/it/newitem/" id="add" class="btn btn-primary" style=" background-color:#1982c4; color: white;" onclick="cancelEdit()">Add</a>
+    </div>
 
+
+    <div class="col-4">
+
+            @Html.PagedListPager((IPagedList)Model, page => Url.Action("Index", new{page}),
+            new PagedListRenderOptions
+            {
+            LiElementClasses = new string[] { "page-item" },
+            PageClasses = new string[] { "page-link" },
+            Display = PagedListDisplayMode.IfNeeded
+
+            })
+      
+    </div>
+        <div class="col-4 deneme">
+                  
+            <label for="pageSize">Number of lines:</label>
+            <select id="pageSize" onchange="changePageSize(this.value)">
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select>
+         </div>
+  </div>
+</div>
 <script>
+
+
+    function changePageSize(pageSize) {
+        window.location.href = `/it/Index?page=1&pageSize=${pageSize}`;
+    }
 
     document.addEventListener("DOMContentLoaded", function () {
 

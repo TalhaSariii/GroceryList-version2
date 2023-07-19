@@ -8,17 +8,20 @@ html {
     }
 }
 
+.body-bg {
+    background-color: #ffbe0b;
+}
 .table-c {
     display: flex;
     justify-content: center;
     align-items: center;
-   
+    
     font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
 }
 
 .table-t {
     max-width: 800px;
-    background-color: #f1dfca;
+    background-color: #4cc9f0;
     table-layout: fixed;
     border: 1px solid black;
 }
@@ -27,9 +30,9 @@ html {
     .table-t th {
         padding: 8px;
         text-align: left;
-        max-width: 150px;
-        white-space: nowrap; 
-        overflow: hidden; 
+        max-width: 100px;
+        
+        
         text-overflow: ellipsis; 
         border: 1px solid black;
     }
@@ -41,10 +44,11 @@ html {
         }
 
 .fixed-header {
-    position: sticky;
+  
     top: 0;
-    background-color: paleturquoise;
-    z-index: 1;
+    
+    background-color: #ff006e;
+   
 }
 
 
@@ -57,13 +61,7 @@ body {
     font-family: "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
-.table-t td.actions-cell {
-    white-space: nowrap;
-    display: flex;
-    flex-wrap: nowrap;
-    justify-content: space-around;
-    align-items: center;
-}
+
 .swal2-confirm {
     margin-left: 20px;
 }
@@ -72,16 +70,60 @@ body {
     margin-right: 20px;
 }
 .inactive-row {
-    background-color: #67635c;
+    background-color: #b5e2fa;
     opacity: 70%;
 }
-.pull-right{
-    
-margin-left:70px;
 
+
+.tippp {
+    position: relative;
+    display: inline-block;
+}
+
+    .tippp .tooltiptext {
+        visibility: hidden;
+        width: 200px;
+        background-color: #555;
+        color: #fff;
+        text-align: center;
+        border-radius: 6px;
+        padding: 5px 0;
+        position: absolute;
+        z-index: 1;
+        bottom: 125%;
+        left: 0%;
+        margin-left: -60px;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+.tippp .tooltiptext::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #555 transparent transparent transparent;
+        }
+.tippp:hover .tooltiptext {
+        visibility: visible;
+        opacity: 1;
+    }
+
+.container {
+    border-radius: 20px;
+    margin-top: 30px;
+    margin-bottom: 20px;
+    width: 850px;
+    max-width: 900px;
 }
 
 
-
-
-
+.deneme {
+    font-family: 'Berlin Sans FB';
+    font-size: 19px;
+   
+    
+}

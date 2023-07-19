@@ -14,10 +14,10 @@ namespace GroceryList.Controllers
     public class itController : Controller
     {
         Context c = new Context();
-        public IActionResult Index(int page=1)
+        public IActionResult Index(int page = 1, int pageSize = 5)
         {
             var values = c.Items.Where(x => x.IsDeleted == false).ToList();
-            return View(values.ToPagedList(page,5));
+            return View(values.ToPagedList(page, pageSize));
         }
         [HttpGet]
         public IActionResult newItem()
