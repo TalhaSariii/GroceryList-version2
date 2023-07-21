@@ -8,14 +8,19 @@ using X.PagedList;
 using X.PagedList.Mvc.Core;
 using X.PagedList.Web.Common;
 using Microsoft.EntityFrameworkCore;
+//using GroceryList.Services;
 
 namespace GroceryList.Controllers
 {
     public class itController : Controller
     {
+        //public readonly IShoppingListAppService _shoppingListAppService;
+
+
         Context c = new Context();
         public IActionResult Index(int page = 1, int pageSize = 5)
         {
+            //var deneme = _shoppingListAppService.isItemExists(148);
             var values = c.Items.Where(x => x.IsDeleted == false).ToList();
             return View(values.ToPagedList(page, pageSize));
         }

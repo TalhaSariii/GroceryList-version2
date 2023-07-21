@@ -79,13 +79,13 @@
                 <td class="actions-cell">
 
                     <div class="edit-wrapper">
-                        <a href="/it/EditItem/@Item.Id" class="btn btn-warning edit-link" style=" background-color:#ffca3a; color: white;">Edit</a>
+                        <a href="/it/EditItem/@Item.Id" class="btn btn-warning edit-link" ><i class="fa-regular fa-pen-to-square"></i></a>
                     </div>
                 </td>
                     <td>
                        
                     <div class="delete-wrapper">
-                        <a href="/it/DeleteItem/@Item.Id" class="btn btn-danger delete-link" style=" background-color:#ff595e; color: white;">Delete</a>
+                        <a href="/it/DeleteItem/@Item.Id" class="btn btn-danger delete-link" style=" background-color:#9d0208; color: white;"><i class="fa-solid fa-trash-can"></i></a>
 
                     </div>
                     
@@ -107,11 +107,17 @@
                         <input type="checkbox" id="isActiveCheckboxEdit_@Item.Id" name="IsActive" @(Item.IsActive ? "checked" : "") />
                     </td>
                     <td>
-                        <input type="submit" value="Save" class="btn btn-success" style=" background-color:#8ac926; color: white;" />
-                       
+                        <button type="submit" class="btn btn-success" style="background-color:#3f7d20; color: white;">
+                            <i class="fas fa-floppy-disk"></i> 
+                        </button>
+
+
                     </td>
                     <td>
-                        <input type="button" value="Cancel" class="btn btn-danger" style=" background-color:#ff595e; color: white;" onclick="cancelEdit()" />
+                        <button type="button" class="btn btn-danger" style="background-color:#9d0208; color: white;" onclick="cancelEdit()">
+                            <i class="fas fa-xmark"></i>
+                        </button>
+
                     </td>
                 </tr>
                 </form>
@@ -121,11 +127,11 @@
     </table>
   
 </div>
-<div class="container">
+<div class="container fixed" >
  <div class="row">
     <div class="col-4">
-    
-        <a href="/it/newitem/" id="add" class="btn btn-primary" style=" background-color:#1982c4; color: white;" onclick="cancelEdit()">Add</a>
+
+            <a href="/it/newitem/" id="add" class="btn btn-primary" style=" background-color:#4E4FEB; color: white;" onclick="cancelEdit()"><i class="fa-solid fa-plus"></i></a>
     </div>
 
 
@@ -142,29 +148,35 @@
       
     </div>
         <div class="col-4 deneme">
-                  
             <label for="pageSize">Number of lines:</label>
-            <select id="pageSize" onchange="changePageSize(this.value)">
+            <select id="pageSize" onchange="changePageSize()">
+               
                 <option value="5">5</option>
                 <option value="10">10</option>
                 <option value="20">20</option>
                 <option value="50">50</option>
                 <option value="100">100</option>
+                
+
             </select>
-         </div>
-  </div>
+        </div>
+    </div>
 </div>
+
+
+
+
 <script>
-
-
-    function changePageSize(pageSize) {
-        window.location.href = `/it/Index?page=1&pageSize=${pageSize}`;
+   
+    function changePageSize() {
+        const selectedValue = document.getElementById('pageSize').value;
+        window.location.href = `/it/Index?page=1&pageSize=${selectedValue}`;
+        const pageSizeText = selectedValue ? `${selectedValue} lines` : '';
+        document.getElementById('pageSizeDisplay').textContent = pageSizeText;
     }
 
-    document.addEventListener("DOMContentLoaded", function () {
-
+        document.addEventListener("DOMContentLoaded", function () {
         const deleteLinks = document.querySelectorAll(".delete-link");
-
 
         deleteLinks.forEach(function (link) {
             link.addEventListener("click", function (event) {
@@ -179,6 +191,7 @@
                     },
                     buttonsStyling: false
                 });
+
                 swalWithBootstrapButtons.fire({
                     title: 'Are you sure?',
                     text: "You won't be able to revert this!",
@@ -206,41 +219,37 @@
             });
         });
 
-        document.addEventListener("DOMContentLoaded", function () {
-         
-            const tableRows = document.querySelectorAll("tr");
-            tableRows.forEach(function (row) {
-                const isActiveCheckbox = row.querySelector("input[type='checkbox'][disabled]");
-                if (isActiveCheckbox && !isActiveCheckbox.checked) {
-                    row.classList.add("inactive-row");
-                }
-            });
+        const tableRows = document.querySelectorAll("tr");
+        tableRows.forEach(function (row) {
+            const isActiveCheckbox = row.querySelector("input[type='checkbox'][disabled]");
+            if (isActiveCheckbox && !isActiveCheckbox.checked) {
+                row.classList.add("inactive-row");
+            }
         });
-
-        function deleteItem(deleteUrl) {
-            fetch(deleteUrl, {
-                method: 'POST'
-            })
-                .then(response => {
-                    if (response.ok) {
-                        window.location.reload();
-                    } else {
-                        throw new Error('Deletion failed.');
-                    }
-                })
-                .catch(error => {
-                    console.error(error);
-                    swalWithBootstrapButtons.fire(
-                        'Error',
-                        'An error occurred during the deletion process.',
-                        'error'
-                    );
-                });
-        }
     });
 
-        function cancelEdit() {
-            window.location.reload();
-        }
-   
+    function deleteItem(deleteUrl) {
+        fetch(deleteUrl, {
+            method: 'POST'
+        })
+            .then(response => {
+                if (response.ok) {
+                    window.location.reload();
+                } else {
+                    throw new Error('Deletion failed.');
+                }
+            })
+            .catch(error => {
+                console.error(error);
+                Swal.fire(
+                    'Error',
+                    'An error occurred during the deletion process.',
+                    'error'
+                );
+            });
+    }
+
+    function cancelEdit() {
+        window.location.reload();
+    }
 </script>

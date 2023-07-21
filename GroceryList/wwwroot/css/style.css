@@ -8,20 +8,17 @@ html {
     }
 }
 
-.body-bg {
-    background-color: #ffbe0b;
-}
+
 .table-c {
     display: flex;
     justify-content: center;
     align-items: center;
-    
     font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
 }
 
 .table-t {
     max-width: 800px;
-    background-color: #4cc9f0;
+    background-color: #f8f9fa;
     table-layout: fixed;
     border: 1px solid black;
 }
@@ -44,14 +41,15 @@ html {
         }
 
 .fixed-header {
-  
     top: 0;
-    
-    background-color: #ff006e;
-   
+    background-color: #4E4FEB;
+    color: aliceblue;
 }
 
 
+.container.fixed{
+    margin-left:29%;
+}
 
 .date-font {
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
@@ -59,8 +57,11 @@ html {
 
 body {
     font-family: "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    
 }
-
+.body-bg {
+    background-color: #EDE4FF;
+}
 
 .swal2-confirm {
     margin-left: 20px;
@@ -70,8 +71,9 @@ body {
     margin-right: 20px;
 }
 .inactive-row {
-    background-color: #b5e2fa;
-    opacity: 70%;
+    background-color: #6c757d;
+   
+
 }
 
 
@@ -120,10 +122,8 @@ body {
     max-width: 900px;
 }
 
-
-.deneme {
-    font-family: 'Berlin Sans FB';
-    font-size: 19px;
+.col-4.deneme {
+    font-size: 20px;
+    font-family:'Yu Gothic UI';
    
-    
 }
