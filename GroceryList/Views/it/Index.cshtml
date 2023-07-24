@@ -15,22 +15,38 @@
 <script src="~/sweetalert/sweetalert2.all.min.js"></script>
 
 
+<div class="container">
+    <div class="row">
+        <div class="col-1"></div>
+        <div class="col-3"></div>
+        <div class="col-4"></div>
+        <div class="col-4 tippp searchbox">
+            <div class="search-container">
+                <input type="text" id="search" onkeyup="searchByName()" placeholder="Type a name...">
+                <span class="tooltiptext">Search by name</span>
+                <i class="fas fa-search"></i>
+            </div>
 
+        </div>
+
+    </div>
+
+</div>
 
 <div class="table-c">
     <table class="table-t">
         <tr>
             <th class="fixed-header">Creation Date</th>
             <th class="fixed-header">Modified Date</th>
-            <th class="fixed-header">Name</th>
-            <th class="fixed-header">Type</th>
+            <th class="fixed-header ">Name</th>
+            <th class="fixed-header ">Type</th>
             <th class="fixed-header">Amount</th>
-            <th class="fixed-header">Price</th>
+            <th class="fixed-header ">Price</th>
             <th class="fixed-header">Shop Name</th>
             <th class="fixed-header">Is Active?</th>
-            <th class="fixed-header">Edit</th>
-            <th class="fixed-header">Delete</th>
-         
+            <th class="fixed-header ">Edit</th>
+            <th class="fixed-header ">Delete</th>
+
 
         </tr>
         @foreach (var Item in Model)
@@ -44,7 +60,7 @@
                         {
                             <div class="tippp">
                                 @Item.Name.Substring(0,8)
-                    <span class="tooltiptext">@Item.Name</span>
+                                <span class="tooltiptext">@Item.Name</span>
                             </div>
                         }
                         else
@@ -52,43 +68,44 @@
                             @Item.Name
                         }
                     }
-               
+
                 </td>
                 <td>@Item.Type</td>
                 <td>@Item.Amount</td>
                 <td>@Item.Price</td>
                 <td>
-                @{
-                    if (@Item.ShopName.Length > 8)
-                    {
-                        <div class="tippp">
-                        @Item.ShopName.Substring(0, 8)
-                        <span class="tooltiptext">@Item.ShopName</span>
-                        </div>
-                    } else
-                    {
+                    @{
+                        if (@Item.ShopName.Length > 8)
+                        {
+                            <div class="tippp">
+                                @Item.ShopName.Substring(0, 8)
+                                <span class="tooltiptext">@Item.ShopName</span>
+                            </div>
+                        }
+                        else
+                        {
 
-                        @Item.ShopName
+                            @Item.ShopName
+                        }
+
                     }
-                 
-                }
                 </td>
                 <td>
                     <input type="checkbox" disabled id="isActiveCheckbox_@Item.Id" @(Item.IsActive ? "checked" : "") />
-                </td >
+                </td>
                 <td class="actions-cell">
 
                     <div class="edit-wrapper">
-                        <a href="/it/EditItem/@Item.Id" class="btn btn-warning edit-link" ><i class="fa-regular fa-pen-to-square"></i></a>
+                        <a href="/it/EditItem/@Item.Id" class="btn btn-warning edit-link"><i class="fa-regular fa-pen-to-square"></i></a>
                     </div>
                 </td>
-                    <td>
-                       
+                <td>
+
                     <div class="delete-wrapper">
                         <a href="/it/DeleteItem/@Item.Id" class="btn btn-danger delete-link" style=" background-color:#9d0208; color: white;"><i class="fa-solid fa-trash-can"></i></a>
 
                     </div>
-                    
+
                 </td>
             </tr>
             @if (Item.IsEditing)
@@ -108,7 +125,7 @@
                     </td>
                     <td>
                         <button type="submit" class="btn btn-success" style="background-color:#3f7d20; color: white;">
-                            <i class="fas fa-floppy-disk"></i> 
+                            <i class="fas fa-floppy-disk"></i>
                         </button>
 
 
@@ -123,51 +140,74 @@
                 </form>
             }
         }
-   
+
     </table>
-  
+
 </div>
-<div class="container fixed" >
- <div class="row">
-    <div class="col-4">
-
-            <a href="/it/newitem/" id="add" class="btn btn-primary" style=" background-color:#4E4FEB; color: white;" onclick="cancelEdit()"><i class="fa-solid fa-plus"></i></a>
-    </div>
+<div class="container ">
+    <div class="row">
+        <div class="col-1"></div>
 
 
-    <div class="col-4">
 
+        <div class="col-3">
+            <a href="/it/newitem/" id="add" class="btn btn-primary" style=" background-color: #805AD5; color: white;" onclick="cancelEdit()">
+                Add  <i class="fa-solid fa-plus"></i>
+            </a>
+        </div>
+
+        <div class="col-4">
             @Html.PagedListPager((IPagedList)Model, page => Url.Action("Index", new{page}),
             new PagedListRenderOptions
             {
             LiElementClasses = new string[] { "page-item" },
             PageClasses = new string[] { "page-link" },
             Display = PagedListDisplayMode.IfNeeded
-
             })
-      
-    </div>
+        </div>
+
         <div class="col-4 deneme">
             <label for="pageSize">Number of lines:</label>
             <select id="pageSize" onchange="changePageSize()">
-               
                 <option value="5">5</option>
-                <option value="10">10</option>
+                <option value="10">10</option>A
                 <option value="20">20</option>
                 <option value="50">50</option>
                 <option value="100">100</option>
-                
-
             </select>
         </div>
     </div>
+
 </div>
 
 
 
 
+
 <script>
-   
+    function searchByName() {
+        const input = document.getElementById('search');
+        const filter = input.value.toUpperCase();
+        const tableRows = document.querySelectorAll('.table-t tr');
+
+        tableRows.forEach(function (row) {
+            const nameColumn = row.getElementsByTagName('td')[2];
+            if (nameColumn) {
+                const nameValue = nameColumn.textContent || nameColumn.innerText;
+                if (nameValue.toUpperCase().indexOf(filter) > -1) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            }
+        });
+    }
+
+    function changePageSize() {
+        const selectedValue = document.getElementById('pageSize').value;
+        window.location.href = `/it/Index?page=1&pageSize=${selectedValue}`;
+    }
+
     function changePageSize() {
         const selectedValue = document.getElementById('pageSize').value;
         window.location.href = `/it/Index?page=1&pageSize=${selectedValue}`;
@@ -175,7 +215,7 @@
         document.getElementById('pageSizeDisplay').textContent = pageSizeText;
     }
 
-        document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", function () {
         const deleteLinks = document.querySelectorAll(".delete-link");
 
         deleteLinks.forEach(function (link) {

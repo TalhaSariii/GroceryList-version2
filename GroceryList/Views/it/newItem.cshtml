@@ -12,24 +12,44 @@
     }
 </style>
 
+<script src="~/sweetalert/sweetalert2.all.min.js"></script>
+
 <div class="form-container">
-    <form class="from-group" method="post">
+    <form class="from-group" method="post" onsubmit="return validateForm()">
         <b>Name</b>
-        @Html.TextBoxFor(x => x.Name, new { @class = "form-control" })
+        @Html.TextBoxFor(x => x.Name, new { @class = "form-control", id = "Name" })
         <br />
         <b>Type</b>
-        @Html.TextBoxFor(x => x.Type, new { @class = "form-control" })
+        @Html.TextBoxFor(x => x.Type, new { @class = "form-control", id = "Type" })
         <br />
         <b>Amount</b>
-        @Html.TextBoxFor(x => x.Amount, new { @class = "form-control" })
+        @Html.TextBoxFor(x => x.Amount, new { @class = "form-control", id = "Amount", type = "number" })
         <br />
         <b>Price</b>
-        @Html.TextBoxFor(x => x.Price, new { @class = "form-control" })
+        @Html.TextBoxFor(x => x.Price, new { @class = "form-control", id = "Price", type = "number" })
         <br />
-        <b>ShopName</b>
-        @Html.TextBoxFor(x => x.ShopName, new { @class = "form-control" })
+        <b>Shop Name</b>
+        @Html.TextBoxFor(x => x.ShopName, new { @class = "form-control", id = "ShopName" })
         <br />
 
-        <button class="btn btn-primary"><i class="fa-solid fa-plus"></i></button>
+        <button class="btn btn-primary">Add <i class="fa-solid fa-plus"></i></button>
     </form>
 </div>
+
+<script>
+    function validateForm() {
+        var name = document.getElementById("Name").value;
+        var type = document.getElementById("Type").value;
+        var amount = parseFloat(document.getElementById("Amount").value);
+        var price = parseFloat(document.getElementById("Price").value);
+        var shopName = document.getElementById("ShopName").value;
+
+        if (!name || !type || isNaN(amount) || isNaN(price) || !shopName) {
+            Swal.fire('Please fill in all fields!')
+
+            return false;
+        }
+
+        return true;
+    }
+</script>
