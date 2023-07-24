@@ -29,6 +29,11 @@ namespace GroceryList.Controllers
         {
             return View();
         }
+        [HttpGet]
+        public IActionResult login()
+        {
+            return View();
+        }
         [HttpPost]
         public IActionResult newItem(Item d)
         {

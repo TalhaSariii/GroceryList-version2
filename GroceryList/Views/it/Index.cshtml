@@ -4,6 +4,7 @@
 @using X.PagedList.Web.Common
 @model IPagedList<Item>
 
+
 @{
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_TestLayout.cshtml";
@@ -13,7 +14,9 @@
 
 
 <script src="~/sweetalert/sweetalert2.all.min.js"></script>
-
+<div class="container p-5 sa" style="background-color:#F2F2F2; color: black; text-align: center;">
+    <h1>Grocery List</h1>
+</div>
 
 <div class="container">
     <div class="row">
@@ -110,16 +113,26 @@
             </tr>
             @if (Item.IsEditing)
             {
-                <form method="post" action="/it/EditItem">
+                <form class="from-group" method="post" action="/it/EditItem" onsubmit="return validateForm()">
                     @Html.Hidden("Id", Item.Id)
                 <tr>
                     <td class="date-font">@Item.CreateDate.ToString("dd.MM.yyyy")</td>
                     <td class="date-font">@Item.ModifiedDate.ToString("dd.MM.yyyy")</td>
-                    <td><input type="text" name="Name" value="@Item.Name" /></td>
-                    <td><input type="text" name="Type" value="@Item.Type" /></td>
-                    <td><input type="number" name="Amount" value="@Item.Amount" /></td>
-                    <td><input type="number" name="Price" value="@Item.Price" /></td>
-                    <td><input type="text" name="ShopName" value="@Item.ShopName" /></td>
+                    <td>
+                        <input type="text" id="Name" name="Name" value="@Item.Name" />
+                    </td>
+                    <td>
+                        <input type="text" id="Type" name="Type" value="@Item.Type" />
+                    </td>
+                    <td>
+                        <input type="number" id="Amount" name="Amount" value="@Item.Amount" />
+                    </td>
+                    <td>
+                        <input type="number" id="Price" name="Price" value="@Item.Price" />
+                    </td>
+                    <td>
+                        <input type="text" id="ShopName" name="ShopName" value="@Item.ShopName" />
+                    </td>
                     <td>
                         <input type="checkbox" id="isActiveCheckboxEdit_@Item.Id" name="IsActive" @(Item.IsActive ? "checked" : "") />
                     </td>
@@ -292,4 +305,18 @@
     function cancelEdit() {
         window.location.reload();
     }
+    function validateForm() {
+            var name = document.getElementById("Name").value;
+            var type = document.getElementById("Type").value;
+            var amount = parseFloat(document.getElementById("Amount").value);
+            var price = parseFloat(document.getElementById("Price").value);
+            var shopName = document.getElementById("ShopName").value;
+
+            if (!name || !type || isNaN(amount) || isNaN(price) || !shopName) {
+                Swal.fire('Please fill in all fields!');
+                return false;
+            }
+
+            return true;
+        }
 </script>
