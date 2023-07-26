@@ -16,6 +16,11 @@
 <div class="container p-5 sa" style="background-color:#F2F2F2; color: black; text-align: center;">
     <h1>Grocery List</h1>
 </div>
+
+@{
+
+    int userId = (int)TempData["UserId"];
+}
 <div class="form-container">
     <form class="from-group" method="post" action="/it/newitems" onsubmit="return validateForm()">
         <b>Name</b>
@@ -33,9 +38,15 @@
         <b>Shop Name</b>
         @Html.TextBoxFor(x => x.ShopName, new { @class = "form-control", id = "ShopName" })
         <br />
-        @Html.TextBoxFor(x => x.UserId, new { @class = "form-control", id = "UserId",type="number" })
-
+        @Html.Hidden("UserId", userId)
+        <br />
       
+
+        <h2>Hoşgeldiniz, User ID @userId</h2>
+
+
+
+
 
         <button class="btn btn-primary">Add <i class="fa-solid fa-plus"></i></button>
     </form>
