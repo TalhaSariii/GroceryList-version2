@@ -17,7 +17,7 @@
     <h1>Grocery List</h1>
 </div>
 <div class="form-container">
-    <form class="from-group" method="post" onsubmit="return validateForm()">
+    <form class="from-group" method="post" action="/it/newitems" onsubmit="return validateForm()">
         <b>Name</b>
         @Html.TextBoxFor(x => x.Name, new { @class = "form-control", id = "Name" })
         <br />
@@ -33,6 +33,9 @@
         <b>Shop Name</b>
         @Html.TextBoxFor(x => x.ShopName, new { @class = "form-control", id = "ShopName" })
         <br />
+        @Html.TextBoxFor(x => x.UserId, new { @class = "form-control", id = "UserId",type="number" })
+
+      
 
         <button class="btn btn-primary">Add <i class="fa-solid fa-plus"></i></button>
     </form>

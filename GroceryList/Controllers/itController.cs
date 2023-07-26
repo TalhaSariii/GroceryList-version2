@@ -1,48 +1,52 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using GroceryList.Models;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Linq;
 using X.PagedList;
-using X.PagedList.Mvc.Core;
-using X.PagedList.Web.Common;
-using Microsoft.EntityFrameworkCore;
-//using GroceryList.Services;
 
 namespace GroceryList.Controllers
 {
     public class itController : Controller
     {
-        //public readonly IShoppingListAppService _shoppingListAppService;
+        private readonly Context c = new Context();
 
-
-        Context c = new Context();
-        public IActionResult Index(int page = 1, int pageSize = 5)
+        public IActionResult Index(int userId, int page = 1, int pageSize = 5)
         {
-            //var deneme = _shoppingListAppService.isItemExists(148);
-            var values = c.Items.Where(x => x.IsDeleted == false).ToList();
+            var values = c.Items.Where(x => x.IsDeleted == false && x.UserId == userId).ToList();
             return View(values.ToPagedList(page, pageSize));
         }
-        [HttpGet]
-        public IActionResult newItem()
-        {
-            return View();
-        }
+
         [HttpGet]
         public IActionResult login()
         {
             return View();
         }
-        [HttpPost]
-        public IActionResult newItem(Item d)
-        {
 
+        [HttpGet]
+        public IActionResult newItem()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult newItems(Item d)
+        {
             c.Items.Add(d);
             c.SaveChanges();
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", new { userId = d.UserId });
         }
-        
+
+        [HttpPost]
+        public IActionResult LoginCheck(string userName, string password)
+        {
+            var existingUser = c.Users.FirstOrDefault(x => x.UserName == userName && x.Password == password);
+            if (existingUser != null)
+            {
+                return RedirectToAction("Index", new { userId = existingUser.UserId, success = "true" });
+            }
+
+            return RedirectToAction("Login", new { success = "false" });
+        }
+
         public IActionResult DeleteItem(int Id)
 
         {
@@ -51,6 +55,7 @@ namespace GroceryList.Controllers
             c.SaveChanges();
             return RedirectToAction("Index");
         }
+
         [HttpGet]
         public IActionResult EditItem(int Id)
         {
@@ -74,7 +79,7 @@ namespace GroceryList.Controllers
             it.ShopName = d.ShopName;
             it.ModifiedDate = d.ModifiedDate;
 
-            
+
             it.IsActive = Request.Form["IsActive"] == "on";
 
             it.IsEditing = false;
@@ -82,10 +87,4 @@ namespace GroceryList.Controllers
             return RedirectToAction("Index");
         }
     }
-
-        
-
-
-
-    }
-
+}

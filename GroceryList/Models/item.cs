@@ -20,7 +20,13 @@ namespace GroceryList.Models
         public bool IsDeleted { get; set; }
         public bool IsActive { get; set; }
 
-        public bool IsEditing { get; set; } 
+        public bool IsEditing { get; set; }
+
+
+        [ForeignKey("Users")]
+        public int ? UserId { get; set; }
+
+
 
 
         public Item()

@@ -66,6 +66,7 @@
                 background-color: #45a049;
             }
 
+       
     </style>
     <title>Login Page</title>
     <link rel="stylesheet" type="text/css" href="style.css">
@@ -73,50 +74,44 @@
 <body>
     <div class="login-container">
         <h2>Login</h2>
-        <form id="login-form" onsubmit="return validateForm()">
+        <form id="login-form" method="post" action="/it/LoginCheck">
             <div class="form-group">
-                <label for="username">Username:</label>
-                <input type="text" id="username" name="username" required>
+                <label for="username">User Name:</label>
+                <input type="text" id="username" name="userName" required>
             </div>
             <div class="form-group">
                 <label for="password">Password:</label>
                 <input type="password" id="password" name="password" required>
             </div>
-           
-                
-            <a href="/it/Index/" id="add" class="btn btn-primary" style=" background-color: #805AD5; color: white;" >
-                Login 
-            </a>
-                
-            
+            <button type="submit" style="background-color: #805AD5; color: white;">Giriş</button>
         </form>
     </div>
-
-    <script> 
-        function validateForm() {
-            <!--Diğer kısım aynı kaldı, sadece JavaScript kodu değiştirildi-- >
-                <script>
-                function validateForm(event) {
-                    event.preventDefault(); // Sayfanın yenilenmesini engelle
-
-                    var username = document.getElementById("username").value;
-                    var password = document.getElementById("password").value;
-
-                    // Giriş doğrulama mantığınızı burada kodlayın.
-                    // Eğer giriş başarılı ise yeni bir sayfaya yönlendirin, örneğin "Home/Index"
-                    // Yanlış şifre girilirse hata mesajı gösterin ve sayfa değiştirmeyin.
-                    if (username === "demo" && password === "123456") {
-                        alert("Login successful!");
-                        // Yönlendirme işlemi:
-                        window.location.href = "/Home/Index"; // Burada "/Home/Index" doğru sayfa adresini değiştirmeniz gerekebilir.
-                    } else {
-                        alert("Invalid username or password!");
-                    }
-                }
-    </script>
-
-
-
-    
 </body>
 </html>
+<script src="~/sweetalert/sweetalert2.all.min.js"></script>
+<script>
+    var queryString = window.location.search;
+    var urlParams = new URLSearchParams(queryString);
+
+    var success = urlParams.get('success');
+
+    if (success === "true") {
+        
+        Swal.fire({
+            title: 'Giriş başarılı!',
+            text: 'Hoş geldiniz.',
+            icon: 'success',
+            confirmButtonColor: '#805AD5',
+            confirmButtonText: 'Tamam'
+        });
+    } else if (success === "false") {
+
+        Swal.fire({
+            title: 'Login Failed!',
+            text: 'Please check your username and password.',
+            icon: 'error',
+            confirmButtonColor: '#805AD5',
+            confirmButtonText: 'OK'
+        });
+    }
+</script>
