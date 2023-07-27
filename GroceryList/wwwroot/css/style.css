@@ -184,3 +184,13 @@ body {
     background-color: #805AD5;
     border-color: #805AD5;
 }
+
+.exit-logo {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 24px;
+    color: #805AD5;
+}
+
+       

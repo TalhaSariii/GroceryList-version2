@@ -24,6 +24,28 @@ namespace GroceryList.Controllers
             return View(values.ToPagedList(page, pageSize));
         }
         [HttpGet]
+        public IActionResult Register()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult Register(Users newUser)
+        {
+          
+            c.Users.Add(newUser);
+            c.SaveChanges();
+
+           
+            int newUserId = newUser.UserId;
+
+            
+            HttpContext.Session.SetInt32("UserId", newUserId);
+
+            
+            return RedirectToAction("Index", new { userId = newUserId, success = "true" });
+        }
+        [HttpGet]
         public IActionResult login()
         {
             return View();
