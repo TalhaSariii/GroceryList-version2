@@ -32,19 +32,28 @@ namespace GroceryList.Controllers
         [HttpPost]
         public IActionResult Register(Users newUser)
         {
-          
+            // Check if the username already exists in the database
+            bool isUsernameTaken = c.Users.Any(u => u.UserName == newUser.UserName);
+
+            if (isUsernameTaken)
+            {
+                // Display an alert and redirect back to the registration page
+                TempData["ErrorMessage"] = "Username is already taken. Please choose a different username.";
+                return RedirectToAction("Register");
+            }
+
+            // If the username is not taken, proceed with registration
             c.Users.Add(newUser);
             c.SaveChanges();
 
-           
             int newUserId = newUser.UserId;
 
-            
             HttpContext.Session.SetInt32("UserId", newUserId);
 
-            
+            // Redirect to the index page with success message
             return RedirectToAction("Index", new { userId = newUserId, success = "true" });
         }
+
         [HttpGet]
         public IActionResult login()
         {
@@ -87,7 +96,7 @@ namespace GroceryList.Controllers
             var existingUser = c.Users.FirstOrDefault(x => x.UserName == userName && x.Password == password);
             if (existingUser != null)
             {
-                // Kullanıcı kimlik doğrulama başarılı, kullanıcı kimliğini Session'a kaydet
+              
                 HttpContext.Session.SetInt32("UserId", existingUser.UserId);
 
                 return RedirectToAction("Index", new { userId = existingUser.UserId, success = "true" });

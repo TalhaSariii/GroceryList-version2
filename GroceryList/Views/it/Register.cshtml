@@ -85,19 +85,25 @@
 </head>
 <body>
     <a href="/it/login" class="exit-logo">&#10006;</a>
-    
-       
-            <div class="form-container sign-up-container">
-                <form action="/it/Register" method="post">
-                    <h1>Create Account</h1>
-                   
-                   
-                    <input type="text" placeholder="UserName" name="Username" required />
-                    <input type="password" placeholder="Password" name="password" required />
-                    <button type="submit">Sign Up</button>
-                </form>
+
+    <div class="form-container sign-up-container">
+        <form action="/it/Register" method="post">
+            <h1>Create Account</h1>
+            <div class="alert-container">
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="alert alert-danger">
+                        @TempData["ErrorMessage"]
+                    </div>
+                }
             </div>
-      
+
+            <input type="text" placeholder="UserName" name="Username" required />
+            <input type="password" placeholder="Password" name="password" required />
+            <button type="submit">Sign Up</button>
+        </form>
+    </div>
+
 
     </body>
 </html>
