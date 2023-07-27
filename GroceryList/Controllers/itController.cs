@@ -3,6 +3,7 @@ using GroceryList.Models;
 using System.Linq;
 using X.PagedList;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 
 namespace GroceryList.Controllers
 {
@@ -10,16 +11,18 @@ namespace GroceryList.Controllers
     {
         private readonly Context c = new Context();
 
-        public IActionResult Index(int userId, int page = 1, int pageSize = 5)
+        public IActionResult Index(int page = 1, int pageSize = 5)
         {
+            var userId = HttpContext.Session.GetInt32("UserId");
+
+            if (userId == null)
+            {
+                return RedirectToAction("Login");
+            }
+
             var values = c.Items.Where(x => x.IsDeleted == false && x.UserId == userId).ToList();
-
-            // Store UserId in session
-            HttpContext.Session.SetInt32("UserId", userId);
-
             return View(values.ToPagedList(page, pageSize));
         }
-
         [HttpGet]
         public IActionResult login()
         {
@@ -62,11 +65,15 @@ namespace GroceryList.Controllers
             var existingUser = c.Users.FirstOrDefault(x => x.UserName == userName && x.Password == password);
             if (existingUser != null)
             {
+                // Kullanıcı kimlik doğrulama başarılı, kullanıcı kimliğini Session'a kaydet
+                HttpContext.Session.SetInt32("UserId", existingUser.UserId);
+
                 return RedirectToAction("Index", new { userId = existingUser.UserId, success = "true" });
             }
 
             return RedirectToAction("Login", new { success = "false" });
         }
+
 
         public IActionResult DeleteItem(int Id)
 
