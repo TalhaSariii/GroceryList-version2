@@ -2,6 +2,7 @@
 using GroceryList.Models;
 using System.Linq;
 using X.PagedList;
+using Microsoft.AspNetCore.Http;
 
 namespace GroceryList.Controllers
 {
@@ -9,14 +10,15 @@ namespace GroceryList.Controllers
     {
         private readonly Context c = new Context();
 
-         public IActionResult Index(int userId, int page = 1, int pageSize = 5)
-          {
-           var values = c.Items.Where(x => x.IsDeleted == false && x.UserId == userId).ToList();
+        public IActionResult Index(int userId, int page = 1, int pageSize = 5)
+        {
+            var values = c.Items.Where(x => x.IsDeleted == false && x.UserId == userId).ToList();
 
-           TempData["UserId"] = userId; 
+            // Store UserId in session
+            HttpContext.Session.SetInt32("UserId", userId);
 
-        return View(values.ToPagedList(page, pageSize));
-           }
+            return View(values.ToPagedList(page, pageSize));
+        }
 
         [HttpGet]
         public IActionResult login()
@@ -29,14 +31,30 @@ namespace GroceryList.Controllers
         {
             return View();
         }
-
         [HttpPost]
         public IActionResult newItems(Item d)
         {
+           
+            var userId = HttpContext.Session.GetInt32("UserId");
+
+           
+            if (userId == null)
+            {
+                
+                return RedirectToAction("login", "it");
+            }
+
+           
+            d.UserId = userId.Value;
+
+     
             c.Items.Add(d);
             c.SaveChanges();
-            return RedirectToAction("Index", new { userId = d.UserId });
+
+            return RedirectToAction("Index", new { userId = userId.Value });
         }
+
+
 
         [HttpPost]
         public IActionResult LoginCheck(string userName, string password)
@@ -59,16 +77,17 @@ namespace GroceryList.Controllers
             return RedirectToAction("Index");
         }
         [HttpGet]
-        public IActionResult EditItem(int Id, int userId)
+        public IActionResult EditItem(int Id)
         {
-            var item = c.Items.FirstOrDefault(x => x.Id == Id && x.UserId == userId);
+            var item = c.Items.FirstOrDefault(x => x.Id == Id && x.UserId == (int)HttpContext.Session.GetInt32("UserId"));
             if (item != null)
             {
                 item.IsEditing = true;
                 c.SaveChanges();
             }
-            return RedirectToAction("Index", new { userId = userId, editing = true }); 
+            return RedirectToAction("Index", new { userId = HttpContext.Session.GetInt32("UserId"), editing = true });
         }
+
 
 
 

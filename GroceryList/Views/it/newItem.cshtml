@@ -17,10 +17,6 @@
     <h1>Grocery List</h1>
 </div>
 
-@{
-
-    int userId = (int)TempData["UserId"];
-}
 <div class="form-container">
     <form class="from-group" method="post" action="/it/newitems" onsubmit="return validateForm()">
         <b>Name</b>
@@ -38,19 +34,23 @@
         <b>Shop Name</b>
         @Html.TextBoxFor(x => x.ShopName, new { @class = "form-control", id = "ShopName" })
         <br />
-        @Html.Hidden("UserId", userId)
-        <br />
-      
 
-        <h2>Hoşgeldiniz, User ID @userId</h2>
+        @{
+            var userId = (int?)ViewContext.HttpContext.Session.GetInt32("UserId");
+        }
 
+   
+        @Html.HiddenFor(x => x.UserId, new { value = userId })
 
-
-
+        @if (userId != null)
+        {
+            <h2>Hoşgeldiniz, User ID @userId</h2>
+        }
 
         <button class="btn btn-primary">Add <i class="fa-solid fa-plus"></i></button>
     </form>
 </div>
+
 
 <script>
     function validateForm() {
@@ -62,7 +62,6 @@
 
         if (!name || !type || isNaN(amount) || isNaN(price) || !shopName) {
             Swal.fire('Please fill in all fields!')
-
             return false;
         }
 

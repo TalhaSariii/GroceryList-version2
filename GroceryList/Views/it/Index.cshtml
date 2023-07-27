@@ -99,7 +99,7 @@
                 <td class="actions-cell">
 
                     <div class="edit-wrapper">
-                        <a href="/it/EditItem/@Item.Id?userId=@TempData["UserId"]" class="btn btn-warning edit-link"><i class="fa-regular fa-pen-to-square"></i></a>
+                        <a href="/it/EditItem/@Item.Id" class="btn btn-warning edit-link"><i class="fa-regular fa-pen-to-square"></i></a>
                     </div>
                 </td>
                 <td>
@@ -114,8 +114,8 @@
             @if (Item.IsEditing)
             {
                 <form class="from-group" method="post" action="/it/EditItem" onsubmit="return validateForm()">
-                    @Html.Hidden("Id", Item.Id) 
-                  
+                    <input type="hidden" name="Id" value="@Item.Id" />
+                    <input type="hidden" name="UserId" value="@Item.UserId" />
                 <tr>
                     <td class="date-font">@Item.CreateDate.ToString("dd.MM.yyyy")</td>
                     <td class="date-font">@Item.ModifiedDate.ToString("dd.MM.yyyy")</td>
@@ -141,14 +141,11 @@
                         <button type="submit" class="btn btn-success" style="background-color:#3f7d20; color: white;">
                             <i class="fas fa-floppy-disk"></i>
                         </button>
-
-
                     </td>
                     <td>
                         <button type="button" class="btn btn-danger" style="background-color:#9d0208; color: white;" onclick="cancelEdit()">
                             <i class="fas fa-xmark"></i>
                         </button>
-
                     </td>
                 </tr>
                 </form>
