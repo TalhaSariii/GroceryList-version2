@@ -4,23 +4,44 @@ using System.Linq;
 using X.PagedList;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Data.SqlClient;
+using System.Globalization;
+using Microsoft.Extensions.Configuration;
 
 namespace GroceryList.Controllers
 {
     public class itController : Controller
     {
+        private readonly IConfiguration _configuration;
+
+
+        public itController(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+
+        private bool IsAdminLogin(string userName, string password)
+        {
+            var adminUserName = _configuration["AdminCredentials:UserName"];
+            var adminPassword = _configuration["AdminCredentials:Password"];
+
+            return userName == adminUserName && password == adminPassword;
+        }
+
         private readonly Context c = new Context();
 
-        public IActionResult Index(int page = 1, int pageSize = 5)
+        public IActionResult Index(int? userId, int page = 1, int pageSize = 5)
         {
-            var userId = HttpContext.Session.GetInt32("UserId");
-
             if (userId == null)
             {
                 return RedirectToAction("Login");
             }
 
-            var values = c.Items.Where(x => x.IsDeleted == false && x.UserId == userId).ToList();
+            var values = c.Items
+                .Where(x => x.IsDeleted == false && x.UserId == userId)
+                .ToList();
+
+            ViewBag.UserId = userId; 
             return View(values.ToPagedList(page, pageSize));
         }
         [HttpGet]
@@ -32,17 +53,17 @@ namespace GroceryList.Controllers
         [HttpPost]
         public IActionResult Register(Users newUser)
         {
-            // Check if the username already exists in the database
+          
             bool isUsernameTaken = c.Users.Any(u => u.UserName == newUser.UserName);
 
             if (isUsernameTaken)
             {
-                // Display an alert and redirect back to the registration page
+               
                 TempData["ErrorMessage"] = "Username is already taken. Please choose a different username.";
                 return RedirectToAction("Register");
             }
 
-            // If the username is not taken, proceed with registration
+        
             c.Users.Add(newUser);
             c.SaveChanges();
 
@@ -50,7 +71,6 @@ namespace GroceryList.Controllers
 
             HttpContext.Session.SetInt32("UserId", newUserId);
 
-            // Redirect to the index page with success message
             return RedirectToAction("Index", new { userId = newUserId, success = "true" });
         }
 
@@ -93,19 +113,39 @@ namespace GroceryList.Controllers
         [HttpPost]
         public IActionResult LoginCheck(string userName, string password)
         {
+            if (IsAdminLogin(userName, password))
+            {
+                HttpContext.Session.SetInt32("IsAdmin", 1);
+                // Admin girişi başarılı, Admin sayfasına yönlendir.
+                return RedirectToAction("AdminPage");
+            }
+
             var existingUser = c.Users.FirstOrDefault(x => x.UserName == userName && x.Password == password);
             if (existingUser != null)
             {
-              
                 HttpContext.Session.SetInt32("UserId", existingUser.UserId);
-
                 return RedirectToAction("Index", new { userId = existingUser.UserId, success = "true" });
             }
-
-            return RedirectToAction("Login", new { success = "false" });
+            else
+            {
+                // Kullanıcı adı veya şifre yanlış, Login sayfasına geri dön.
+                return RedirectToAction("Login", new { success = "false" });
+            }
         }
-
-
+        [HttpGet]
+        public IActionResult AdminPage()
+        {
+            var isAdmin = HttpContext.Session.GetInt32("IsAdmin");
+            if (isAdmin == 1)
+            {
+                var users = c.Users.ToList();
+                return View(users);
+            }
+            else
+            {
+                return RedirectToAction("Login");
+            }
+        }
         public IActionResult DeleteItem(int Id)
 
         {
@@ -148,6 +188,47 @@ namespace GroceryList.Controllers
             }
             return RedirectToAction("Index", new { userId = d.UserId });
         }
+
+        [HttpGet]
+        public IActionResult EditUser(int userId)
+        {
+            var user = c.Users.FirstOrDefault(x => x.UserId == userId);
+            if (user == null)
+            {
+                return RedirectToAction("AdminPage");
+            }
+
+            return View(user);
+        }
+
+        [HttpPost]
+        public IActionResult UpdateUser(Users updatedUser)
+        {
+            var user = c.Users.FirstOrDefault(x => x.UserId == updatedUser.UserId);
+            if (user != null)
+            {
+                user.UserName = updatedUser.UserName;
+                user.Password = updatedUser.Password;
+                // Diğer kullanıcı bilgileri için burada güncelleme yapabilirsiniz.
+                c.SaveChanges();
+            }
+
+            return RedirectToAction("AdminPage");
+        }
+        [HttpGet]
+        public IActionResult DeleteUser(int userId)
+        {
+            var user = c.Users.FirstOrDefault(u => u.UserId == userId);
+            if (user != null)
+            {
+                // Silme işlemini burada yapın
+                c.Users.Remove(user);
+                c.SaveChanges();
+            }
+
+            return RedirectToAction("AdminPage");
+        }
+
 
     }
 }

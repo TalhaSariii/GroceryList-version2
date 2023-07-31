@@ -1,0 +1,93 @@
+﻿@model List<Users>
+@{
+    ViewData["Title"] = "AdminPage";
+    Layout = "~/Views/Shared/_TestLayout.cshtml";
+}
+
+<style>
+    .user-box {
+        width: 300px;
+        background-color: #e8e8e8;
+        border-radius: 5px;
+        margin: 10px;
+        padding: 10px;
+        display: inline-block;
+        position: relative;
+    }
+
+    .user-info {
+        font-size: 18px;
+        font-weight: bold;
+    }
+
+    .settings-btn {
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+        position: absolute;
+        top: 5px;
+        right: 5px;
+    }
+
+    .settings-icon {
+        color: #3498db;
+    }
+
+    .settings-options {
+        display: none;
+        position: absolute;
+        background-color: #f9f9f9;
+        box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+        z-index: 1;
+        padding: 5px;
+        border-radius: 5px;
+        top: 30px;
+        right: 5px;
+    }
+
+    .settings-btn.active + .settings-options {
+        display: block;
+    }
+
+    .settings-options button {
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+        margin-right: 10px;
+    }
+</style>
+
+<a href="/it/login" class="exit-logo">&#10006;</a>
+<div class="container p-5 sa" style="background-color:#F2F2F2; color: black; text-align: center;">
+    <h1>Admin Page</h1>
+</div>
+
+<div class="container">
+    @foreach (var user in Model)
+    {
+        <div class="user-box">
+            <div class="user-info">User ID: @user.UserId</div>
+            <div class="user-info">User Name: @user.UserName</div>
+            <button class="settings-btn" onclick="toggleOptions('@user.UserId')">
+                <i class="fa-solid fa-gear settings-icon"></i>
+            </button>
+            <div class="settings-options" id="options-@user.UserId">
+                <button onclick="location.href='@Url.Action("EditUser", "it", new { userId = user.UserId })'">Update</button>
+                <button onclick="showUserTable('@user.UserId')">Show User Table</button>
+            </div>
+        </div>
+    }
+</div>
+
+<script>
+    function toggleOptions(userId) {
+        const optionsDiv = document.getElementById('options-' + userId);
+        optionsDiv.classList.toggle('active');
+    }
+
+    function showUserTable(userId) {
+        // Burada kullanıcının tablosunun linkine yönlendirme yapabilirsiniz.
+        // Örnek olarak:
+        // location.href = '/it/UserTable?userId=' + userId;
+    }
+</script>

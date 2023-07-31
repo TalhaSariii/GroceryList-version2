@@ -1,4 +1,4 @@
-html {
+﻿html {
     font-size: 14px;
 }
 
@@ -191,6 +191,7 @@ body {
     right: 20px;
     font-size: 24px;
     color: #805AD5;
+    text-decoration:none;
 }
 
        

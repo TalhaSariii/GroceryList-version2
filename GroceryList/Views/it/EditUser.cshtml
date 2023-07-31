@@ -1,0 +1,37 @@
+﻿@model Users
+@{
+    ViewData["Title"] = "Edit User";
+    Layout = "~/Views/Shared/_TestLayout.cshtml";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <h1 class="text-center">Edit User</h1>
+
+            <div class="user-info text-center">
+                <strong>User ID:</strong> @Model.UserId
+            </div>
+
+            <form method="post" asp-action="UpdateUser">
+                <input type="hidden" asp-for="UserId" />
+
+                <div class="form-group">
+                    <label asp-for="UserName">User Name:</label>
+                    <input asp-for="UserName" class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Password">Password:</label>
+                    <input asp-for="Password" class="form-control" />
+                </div>
+
+                <!-- Diğer kullanıcı bilgilerini burada ekleyebilirsiniz -->
+
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

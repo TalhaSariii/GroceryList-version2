@@ -42,17 +42,16 @@
 <div class="table-c">
     <table class="table-t">
         <tr>
-            <th class="fixed-header">Creation Date</th>
-            <th class="fixed-header">Modified Date</th>
-            <th class="fixed-header ">Name</th>
-            <th class="fixed-header ">Type</th>
-            <th class="fixed-header">Amount</th>
-            <th class="fixed-header ">Price</th>
-            <th class="fixed-header">Shop Name</th>
+            <th class="fixed-header" onclick="sortByCreationDate()">Creation Date</th>
+            <th class="fixed-header" onclick="sortByModifiedDate()">Modified Date</th>
+            <th class="fixed-header" onclick="sortByName()">Name</th>
+            <th class="fixed-header" onclick="sortByType()">Type</th>
+            <th class="fixed-header" onclick="sortByAmount()">Amount</th>
+            <th class="fixed-header" onclick="sortByPrice()">Price</th>
+            <th class="fixed-header" onclick="sortByShopName()">Shop Name</th>
             <th class="fixed-header">Is Active?</th>
-            <th class="fixed-header ">Edit</th>
-            <th class="fixed-header ">Delete</th>
-
+            <th class="fixed-header">Edit</th>
+            <th class="fixed-header">Delete</th>
 
         </tr>
         @foreach (var Item in Model)
@@ -198,37 +197,91 @@
 
 
 
+
+
 <script>
-    function searchByName() {
-        const input = document.getElementById('search');
-        const filter = input.value.toUpperCase();
-        const tableRows = document.querySelectorAll('.table-t tr');
+    let sortByCreationDateAsc = true;
+    let sortByModifiedDateAsc = true;
+    let sortByNameAsc = true;
+    let sortByTypeAsc = true;
+    let sortByAmountAsc = true;
+    let sortByPriceAsc = true;
+    let sortByShopNameAsc = true;
 
-        tableRows.forEach(function (row) {
-            const nameColumn = row.getElementsByTagName('td')[2];
-            if (nameColumn) {
-                const nameValue = nameColumn.textContent || nameColumn.innerText;
-                if (nameValue.toUpperCase().indexOf(filter) > -1) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
+    function sortByCreationDate() {
+        sortTable(0, 'date', sortByCreationDateAsc);
+        sortByCreationDateAsc = !sortByCreationDateAsc;
+    }
+
+    function sortByModifiedDate() {
+        sortTable(1, 'date', sortByModifiedDateAsc);
+        sortByModifiedDateAsc = !sortByModifiedDateAsc;
+    }
+
+    function sortByName() {
+        sortTable(2, 'text', sortByNameAsc);
+        sortByNameAsc = !sortByNameAsc;
+    }
+
+    function sortByType() {
+        sortTable(3, 'text', sortByTypeAsc);
+        sortByTypeAsc = !sortByTypeAsc;
+    }
+
+    function sortByAmount() {
+        sortTable(4, 'number', sortByAmountAsc);
+        sortByAmountAsc = !sortByAmountAsc;
+    }
+
+    function sortByPrice() {
+        sortTable(5, 'number', sortByPriceAsc);
+        sortByPriceAsc = !sortByPriceAsc;
+    }
+
+    function sortByShopName() {
+        sortTable(6, 'text', sortByShopNameAsc);
+        sortByShopNameAsc = !sortByShopNameAsc;
+    }
+
+    function sortTable(columnIndex, dataType, sortAsc) {
+        const tableBody = document.querySelector('.table-t tbody');
+        const tableRows = Array.from(tableBody.querySelectorAll('tr'));
+        const headerRow = tableRows.shift(); 
+        const sortedRows = tableRows.sort((rowA, rowB) => {
+            const valueA = getValueFromRow(rowA, columnIndex, dataType);
+            const valueB = getValueFromRow(rowB, columnIndex, dataType);
+
+            if (dataType === 'text' || dataType === 'date') {
+                return sortAsc ? valueA.localeCompare(valueB) : valueB.localeCompare(valueA);
+            } else if (dataType === 'number') {
+                return sortAsc ? valueA - valueB : valueB - valueA;
             }
+
+            return 0;
         });
+
+     
+        tableBody.innerHTML = '';
+        tableBody.appendChild(headerRow);
+
+       
+        sortedRows.forEach(row => tableBody.appendChild(row));
     }
 
-    function changePageSize() {
-        const selectedValue = document.getElementById('pageSize').value;
-        window.location.href = `/it/Index?page=1&pageSize=${selectedValue}`;
-    }
+    function getValueFromRow(row, columnIndex, dataType) {
+        const cell = row.querySelector(`td:nth-child(${columnIndex + 1})`);
+        let value = cell ? cell.textContent.trim() : '';
 
-    function changePageSize() {
-        const selectedValue = document.getElementById('pageSize').value;
-        window.location.href = `/it/Index?page=1&pageSize=${selectedValue}`;
-        const pageSizeText = selectedValue ? `${selectedValue} lines` : '';
-        document.getElementById('pageSizeDisplay').textContent = pageSizeText;
-    }
+        if (dataType === 'number') {
+            value = parseFloat(value.replace(',', '.')); 
+        } else if (dataType === 'date') {
+            const dateParts = value.split('.');
+            value = new Date(dateParts[2], dateParts[1] - 1, dateParts[0]); 
+        }
 
+        return value;
+    }
+    
     document.addEventListener("DOMContentLoaded", function () {
         const deleteLinks = document.querySelectorAll(".delete-link");
 
@@ -306,18 +359,20 @@
     function cancelEdit() {
         window.location.reload();
     }
+
     function validateForm() {
-            var name = document.getElementById("Name").value;
-            var type = document.getElementById("Type").value;
-            var amount = parseFloat(document.getElementById("Amount").value);
-            var price = parseFloat(document.getElementById("Price").value);
-            var shopName = document.getElementById("ShopName").value;
+        var name = document.getElementById("Name").value;
+        var type = document.getElementById("Type").value;
+        var amount = parseFloat(document.getElementById("Amount").value);
+        var price = parseFloat(document.getElementById("Price").value);
+        var shopName = document.getElementById("ShopName").value;
 
-            if (!name || !type || isNaN(amount) || isNaN(price) || !shopName) {
-                Swal.fire('Please fill in all fields!');
-                return false;
-            }
-
-            return true;
+        if (!name || !type || isNaN(amount) || isNaN(price) || !shopName) {
+            Swal.fire('Please fill in all fields!');
+            return false;
         }
+
+        return true;
+    }
 </script>
+
