@@ -1,0 +1,66 @@
+﻿@using GroceryList.Models
+@using X.PagedList
+@using X.PagedList.Mvc.Core
+@using X.PagedList.Web.Common
+@model X.PagedList.IPagedList<GroceryList.Models.Item>
+    
+
+
+@{
+    ViewData["Title"] = "AdminTable";
+    Layout = "~/Views/Shared/_TestLayout.cshtml";
+}
+
+<style>
+    /* Tablo stilini burada tanımlayabilirsiniz */
+    /* Örnek olarak: */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        padding: 8px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+    }
+</style>
+
+<a href="/it/login" class="exit-logo">&#10006;</a>
+<div class="container p-5 sa" style="background-color:#F2F2F2; color: black; text-align: center;">
+    <h1>User Table</h1>
+</div>
+<div class="pagination-container">
+    @Html.PagedListPager(Model, page => Url.Action("AdminTable", new { page }))
+</div>
+
+<div class="container">
+    <h2>User ID: @ViewData["UserId"]</h2> <!-- Kullanıcının ID'sini burada gösterebilirsiniz -->
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Amount</th>
+                <th>Price</th>
+                <th>Shop Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Name</td>
+                    <td>@item.Type</td>
+                    <td>@item.Amount</td>
+                    <td>@item.Price</td>
+                    <td>@item.ShopName</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

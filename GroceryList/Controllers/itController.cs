@@ -30,20 +30,28 @@ namespace GroceryList.Controllers
 
         private readonly Context c = new Context();
 
-        public IActionResult Index(int? userId, int page = 1, int pageSize = 5)
+        public IActionResult Index(int? page, int userId, int pageSize = 5)
         {
             if (userId == null)
             {
                 return RedirectToAction("Login");
             }
 
+            // Eğer URL'de sayfa numarası parametresi yoksa ya da 1'den küçükse 1 olarak ayarla
+            int pageNumber = page ?? 1;
+            // Eğer URL'de sayfa boyutu parametresi yoksa ya da geçersizse varsayılan boyutu kullan
+            int validPageSize = (pageSize > 0) ? pageSize : 5;
+
             var values = c.Items
                 .Where(x => x.IsDeleted == false && x.UserId == userId)
                 .ToList();
 
-            ViewBag.UserId = userId; 
-            return View(values.ToPagedList(page, pageSize));
+            ViewBag.UserId = userId;
+
+            var pagedList = values.ToPagedList(pageNumber, validPageSize);
+            return View(pagedList);
         }
+
         [HttpGet]
         public IActionResult Register()
         {
@@ -215,6 +223,7 @@ namespace GroceryList.Controllers
 
             return RedirectToAction("AdminPage");
         }
+
         [HttpGet]
         public IActionResult DeleteUser(int userId)
         {
@@ -228,6 +237,16 @@ namespace GroceryList.Controllers
 
             return RedirectToAction("AdminPage");
         }
+
+        [HttpGet]
+        public IActionResult AdminTable(int userId)
+        {
+            // Kullanıcının tablosunu çekmek için gerekli işlemleri yapın.
+            // Örneğin:
+            var userItems = c.Items.Where(x => x.UserId == userId && x.IsDeleted == false).ToList();
+            return View(userItems);
+        }
+
 
 
     }
