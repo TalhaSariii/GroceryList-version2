@@ -17,11 +17,30 @@
 
 <a href="/it/login" class="exit-logo">&#10006;</a>
 <div class="container p-5 sa" style="background-color:#F2F2F2; color: black; text-align: center;">
-   
     <h1>Grocery List</h1>
+   
+   
 </div>
 
+
+
 <div class="container">
+
+   <div class="profile-picture-form">
+  <div class="profile-picture">
+    <img src="@ViewBag.ProfilePictureURL" alt="Profile Picture" />
+  </div>
+        <form method="post" action="/it/EditProfilePicture" enctype="multipart/form-data">
+            <label for="profilePicture" class="change-profile-picture-label"><i class="fa-solid fa-pencil"></i></label>
+            <input type="file" name="profilePicture" accept=".jpg, .jpeg, .png" id="profilePicture" style="display:none;" />
+            <button type="submit" class="change-profile-picture-button"><i class="fa-solid fa-download"></i></button>
+        </form>
+        
+
+</div>
+
+
+
     <div class="row">
         <div class="col-1"></div>
         <div class="col-3"></div>
@@ -385,13 +404,12 @@
 
     function searchByName() {
         var input, filter, table, tr, td, i, txtValue;
-        input = document.getElementById("search");
+        input = document.getElementById("search");   
         filter = input.value.toUpperCase();
         table = document.getElementsByClassName("table-t")[0];
         tr = table.getElementsByTagName("tr");
-        for (i = 1; i < tr.length; i++) { // Skip the header row (index 0)
-            td = tr[i].getElementsByTagName("td")[2]; // Name column (index 2)
-            if (td) {
+        for (i = 1; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName("td")[2]; 
                 txtValue = td.textContent || td.innerText;
                 if (txtValue.toUpperCase().indexOf(filter) > -1) {
                     tr[i].style.display = "";
@@ -405,20 +423,20 @@
     document.addEventListener("DOMContentLoaded", function () {
         searchByName();
 
-        // Number of lines (satır sayısı) seçildiğinde çalışacak fonksiyon
+       
         const pageSizeSelect = document.getElementById("pageSize");
         pageSizeSelect.addEventListener("change", function () {
             changePageSize();
         });
     });
 
-    // Diğer JavaScript kodları...
+  
 
     function changePageSize() {
         const pageSizeSelect = document.getElementById("pageSize");
         const selectedPageSize = parseInt(pageSizeSelect.value);
 
-        // Yeni sayfa boyutuna göre sayfalandırma yap
+    
         window.location.href = getUrlWithNewPageSize(selectedPageSize);
     }
 

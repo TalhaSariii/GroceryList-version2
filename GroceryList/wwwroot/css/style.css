@@ -193,5 +193,95 @@ body {
     color: #805AD5;
     text-decoration:none;
 }
+/* Profil resmi düzenleme formu stilleri */
+.profile-picture-form {
+    display: flex;
+    flex-direction: column;
+   
+    justify-content: center;
+    margin-top: 20px;
+}
+.change-profile-picture-label,
+.change-profile-picture-button {
+    margin-right: 60px;
+}
+.change-profile-picture-label {
+    font-size: 16px;
+    margin-right: 20px;
+    padding: 8px 12px;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+    cursor: pointer;
+    display: inline-block;
+}
 
-       
+    .change-profile-picture-label i {
+        margin-right: 5px;
+    }
+
+.change-profile-picture-button {
+    font-size: 16px;
+    margin-left: 20px;
+    padding: 8px 12px;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+    cursor: pointer;
+    display: inline-block;
+}
+
+    .change-profile-picture-button i {
+        margin-right: 5px;
+    }
+
+
+.profile-picture {
+    width: 150px;      
+    height: 150px;
+    border-radius: 50%;
+    overflow: hidden;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+}
+
+    .profile-picture img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+.profile-picture-form input[type="file"] {
+    display: none;
+}
+
+.change-profile-picture-label {
+    cursor: pointer;
+    background-color: #d5be06;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    
+    text-decoration: none;
+    font-size: 14px;
+    margin-top: 10px;
+    border-radius: 5px;
+}
+
+    .change-profile-picture-label:hover {
+        background-color: #45a049;
+    }
+
+.change-profile-picture-btn {
+    cursor: pointer;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 14px;
+    margin-top: 10px;
+    border-radius: 5px;
+}
+
+    .change-profile-picture-btn:hover {
+        background-color: #45a049;
+    }

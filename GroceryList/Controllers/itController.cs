@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.Data.SqlClient;
 using System.Globalization;
 using Microsoft.Extensions.Configuration;
+using System.IO;
+using Microsoft.AspNetCore.Hosting;
+
 
 namespace GroceryList.Controllers
 {
@@ -15,10 +18,14 @@ namespace GroceryList.Controllers
         private readonly IConfiguration _configuration;
 
 
-        public itController(IConfiguration configuration)
+        private readonly IWebHostEnvironment _webHostEnvironment;
+
+        public itController(IWebHostEnvironment webHostEnvironment, IConfiguration configuration)
         {
+            _webHostEnvironment = webHostEnvironment;
             _configuration = configuration;
         }
+
 
         private bool IsAdminLogin(string userName, string password)
         {
@@ -28,7 +35,17 @@ namespace GroceryList.Controllers
             return userName == adminUserName && password == adminPassword;
         }
 
+        private Users GetUserById(int userId)
+        {
+          
+            var user = c.Users.FirstOrDefault(u => u.UserId == userId);
+
+            
+
+            return user;
+        }
         private readonly Context c = new Context();
+
 
         public IActionResult Index(int? page, int userId, int pageSize = 5)
         {
@@ -37,10 +54,18 @@ namespace GroceryList.Controllers
                 return RedirectToAction("Login");
             }
 
-            // Eğer URL'de sayfa numarası parametresi yoksa ya da 1'den küçükse 1 olarak ayarla
             int pageNumber = page ?? 1;
-            // Eğer URL'de sayfa boyutu parametresi yoksa ya da geçersizse varsayılan boyutu kullan
             int validPageSize = (pageSize > 0) ? pageSize : 5;
+
+            Users currentUser = GetUserById(userId);
+
+            if (currentUser == null)
+            {
+                // Kullanıcı bulunamadı, hata durumunda yönlendir
+                return RedirectToAction("Login");
+            }
+
+            ViewBag.ProfilePictureURL = currentUser.ProfilePictureURL;
 
             var values = c.Items
                 .Where(x => x.IsDeleted == false && x.UserId == userId)
@@ -51,6 +76,8 @@ namespace GroceryList.Controllers
             var pagedList = values.ToPagedList(pageNumber, validPageSize);
             return View(pagedList);
         }
+
+
 
         [HttpGet]
         public IActionResult Register()
@@ -117,14 +144,13 @@ namespace GroceryList.Controllers
         }
 
 
-
         [HttpPost]
         public IActionResult LoginCheck(string userName, string password)
         {
             if (IsAdminLogin(userName, password))
             {
                 HttpContext.Session.SetInt32("IsAdmin", 1);
-                // Admin girişi başarılı, Admin sayfasına yönlendir.
+               
                 return RedirectToAction("AdminPage");
             }
 
@@ -136,10 +162,12 @@ namespace GroceryList.Controllers
             }
             else
             {
-                // Kullanıcı adı veya şifre yanlış, Login sayfasına geri dön.
+               
                 return RedirectToAction("Login", new { success = "false" });
             }
         }
+
+
         [HttpGet]
         public IActionResult AdminPage()
         {
@@ -160,21 +188,28 @@ namespace GroceryList.Controllers
             var it = c.Items.Find(Id);
             it.IsDeleted = true;
             c.SaveChanges();
-            return RedirectToAction("Index");
+            return RedirectToAction("EditItem");
         }
+        
         [HttpGet]
         public IActionResult EditItem(int Id)
         {
-            var item = c.Items.FirstOrDefault(x => x.Id == Id && x.UserId == (int)HttpContext.Session.GetInt32("UserId"));
+            var userId = HttpContext.Session.GetInt32("UserId");
+
+            if (!userId.HasValue)
+            {
+                
+                return RedirectToAction("Login", "it"); 
+            }
+
+            var item = c.Items.FirstOrDefault(x => x.Id == Id && x.UserId == userId.Value);
             if (item != null)
             {
                 item.IsEditing = true;
                 c.SaveChanges();
             }
-            return RedirectToAction("Index", new { userId = HttpContext.Session.GetInt32("UserId"), editing = true });
+            return RedirectToAction("Index", new { userId = userId, editing = true });
         }
-
-
 
 
 
@@ -196,7 +231,6 @@ namespace GroceryList.Controllers
             }
             return RedirectToAction("Index", new { userId = d.UserId });
         }
-
         [HttpGet]
         public IActionResult EditUser(int userId)
         {
@@ -217,7 +251,7 @@ namespace GroceryList.Controllers
             {
                 user.UserName = updatedUser.UserName;
                 user.Password = updatedUser.Password;
-                // Diğer kullanıcı bilgileri için burada güncelleme yapabilirsiniz.
+              
                 c.SaveChanges();
             }
 
@@ -230,22 +264,107 @@ namespace GroceryList.Controllers
             var user = c.Users.FirstOrDefault(u => u.UserId == userId);
             if (user != null)
             {
-                // Silme işlemini burada yapın
+               
                 c.Users.Remove(user);
                 c.SaveChanges();
             }
 
             return RedirectToAction("AdminPage");
-        }
+        }   
 
         [HttpGet]
-        public IActionResult AdminTable(int userId)
+        public IActionResult AdminTable(int userId, int? page)
         {
-            // Kullanıcının tablosunu çekmek için gerekli işlemleri yapın.
-            // Örneğin:
-            var userItems = c.Items.Where(x => x.UserId == userId && x.IsDeleted == false).ToList();
+            const int pageSize = 10; 
+            var userItems = c.Items.Where(x => x.UserId == userId && x.IsDeleted == false)
+                                   .ToPagedList(page ?? 1, pageSize);
             return View(userItems);
         }
+
+
+        [HttpGet]
+        public IActionResult EditAdminItem(int Id, int UserId)
+        {
+            if (UserId <= 0)
+            {
+                // UserId is not valid or not authenticated, redirect to Login
+                return RedirectToAction("Login", "it");
+            }
+
+            var item = c.Items.FirstOrDefault(x => x.Id == Id && x.UserId == UserId);
+            if (item != null)
+            {
+                item.IsEditing = true;
+                c.SaveChanges();
+            }
+            return RedirectToAction("AdminTable", new { userId = UserId, editing = true });
+        }
+
+       
+
+        [HttpPost]
+        public IActionResult EditAdminItem(Item d)
+        {
+            var it = c.Items.FirstOrDefault(x => x.Id == d.Id && x.UserId == d.UserId);
+            if (it != null)
+            {
+                it.Name = d.Name;
+                it.Type = d.Type;
+                it.Amount = d.Amount;
+                it.Price = d.Price;
+                it.ShopName = d.ShopName;
+                it.ModifiedDate = d.ModifiedDate;
+                it.IsActive = Request.Form["IsActive"] == "on";
+                it.IsEditing = false;
+                c.SaveChanges();
+            }
+            return RedirectToAction("AdminTable", new { userId = d.UserId });
+        }
+        private readonly IWebHostEnvironment _hostingEnvironment;
+
+
+        [HttpPost]
+        public IActionResult EditProfilePicture(IFormFile profilePicture)
+        {
+            if (profilePicture != null && profilePicture.Length > 0)
+            {
+                // Resim yükleme işlemi
+                string uploadsFolder = Path.Combine(_webHostEnvironment.ContentRootPath, "wwwroot", "uploads");
+                string uniqueFileName = Guid.NewGuid().ToString() + "_" + profilePicture.FileName;
+                string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    profilePicture.CopyTo(fileStream);
+                }
+
+                // Resim yüklendikten sonra kullanıcının profil resmi URL'sini güncelleyin.
+                string profilePictureURL = "/uploads/" + uniqueFileName;
+
+                // Kullanıcının kimliğini (UserId) oturuma tekrar atayın
+                var userId = HttpContext.Session.GetInt32("UserId");
+                if (userId.HasValue)
+                {
+                    var currentUser = GetUserById(userId.Value);
+                    if (currentUser != null)
+                    {
+                        currentUser.ProfilePictureURL = profilePictureURL;
+                        c.SaveChanges();
+
+                        // UserId'yi TempData ile taşıyın
+                        TempData["UserId"] = userId.Value;
+                    }
+                }
+
+                // Profil resmi güncellendiğinde, kullanıcıyı fotoğraf değiştirme sayfasına yönlendirin.
+                return RedirectToAction("EditItem");
+            }
+
+            // Eğer resim yüklenmemişse, hata durumunda veya başka durumlarda yine Index sayfasına yönlendirin.
+            return RedirectToAction("Index");
+        }
+
+
 
 
 

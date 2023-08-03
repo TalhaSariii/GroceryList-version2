@@ -2,8 +2,7 @@
 @using X.PagedList
 @using X.PagedList.Mvc.Core
 @using X.PagedList.Web.Common
-@model X.PagedList.IPagedList<GroceryList.Models.Item>
-    
+@model IPagedList<Item>
 
 
 @{
@@ -12,55 +11,401 @@
 }
 
 <style>
-    /* Tablo stilini burada tanımlayabilirsiniz */
-    /* Örnek olarak: */
-    table {
-        width: 100%;
-        border-collapse: collapse;
-    }
 
-    th, td {
-        padding: 8px;
-        border-bottom: 1px solid #ddd;
-    }
-
-    th {
-        background-color: #f2f2f2;
-        font-weight: bold;
-    }
 </style>
+
+<script src="~/sweetalert/sweetalert2.all.min.js"></script>
 
 <a href="/it/login" class="exit-logo">&#10006;</a>
 <div class="container p-5 sa" style="background-color:#F2F2F2; color: black; text-align: center;">
-    <h1>User Table</h1>
-</div>
-<div class="pagination-container">
-    @Html.PagedListPager(Model, page => Url.Action("AdminTable", new { page }))
+
+    <h1>User Admin</h1>
 </div>
 
 <div class="container">
-    <h2>User ID: @ViewData["UserId"]</h2> <!-- Kullanıcının ID'sini burada gösterebilirsiniz -->
-    <table>
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Type</th>
-                <th>Amount</th>
-                <th>Price</th>
-                <th>Shop Name</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td>@item.Name</td>
-                    <td>@item.Type</td>
-                    <td>@item.Amount</td>
-                    <td>@item.Price</td>
-                    <td>@item.ShopName</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <div class="row">
+        <div class="col-12 text-center mb-3">
+            <h4>User ID: @Model.FirstOrDefault()?.UserId</h4>
+           
+        </div>
+    </div>
 </div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-1"></div>
+        <div class="col-3"></div>
+        <div class="col-4"></div>
+        <div class="col-4 tippp searchbox">
+            <div class="search-container">
+                <input type="text" id="search" onkeyup="searchByName()" placeholder="Type a name...">
+                <span class="tooltiptext">Search by name</span>
+                <i class="fas fa-search"></i>
+            </div>
+        </div>
+
+
+    </div>
+
+</div>
+
+    </div>
+
+</div>
+
+<div class="table-c">
+    <table class="table-t">
+        <tr>
+            <th class="fixed-header" onclick="sortByCreationDate()">Creation Date</th>
+            <th class="fixed-header" onclick="sortByModifiedDate()">Modified Date</th>
+            <th class="fixed-header" onclick="sortByName()">Name</th>
+            <th class="fixed-header" onclick="sortByType()">Type</th>
+            <th class="fixed-header" onclick="sortByAmount()">Amount</th>
+            <th class="fixed-header" onclick="sortByPrice()">Price</th>
+            <th class="fixed-header" onclick="sortByShopName()">Shop Name</th>
+            <th class="fixed-header">Is Active?</th>
+            <th class="fixed-header">Edit</th>
+            <th class="fixed-header">Delete</th>
+
+        </tr>
+        @foreach (var Item in Model)
+        {
+            <tr class="@(!Item.IsActive ? "inactive-row" : "")">
+                <td class="date-font">@Item.CreateDate.ToString("dd.MM.yyyy hh:mm")</td>
+                <td class="date-font">@Item.ModifiedDate.ToString("dd.MM.yyyy hh:mm")</td>
+                <td>
+                    @{
+                        if (@Item.Name.Length > 8)
+                        {
+                            <div class="tippp">
+                                @Item.Name.Substring(0,8)
+                                <span class="tooltiptext">@Item.Name</span>
+                            </div>
+                        }
+                        else
+                        {
+                            @Item.Name
+                        }
+                    }
+
+                </td>
+                <td>@Item.Type</td>
+                <td>@Item.Amount</td>
+                <td>@Item.Price</td>
+                <td>
+                    @{
+                        if (@Item.ShopName.Length > 8)
+                        {
+                            <div class="tippp">
+                                @Item.ShopName.Substring(0, 8)
+                                <span class="tooltiptext">@Item.ShopName</span>
+                            </div>
+                        }
+                        else
+                        {
+
+                            @Item.ShopName
+                        }
+
+                    }
+                </td>
+                <td>
+                    <input type="checkbox" disabled id="isActiveCheckbox_@Item.Id" @(Item.IsActive ? "checked" : "") />
+                </td>
+                <td class="actions-cell">
+
+                    <div class="edit-wrapper">
+                        <a href="@Url.Action("EditAdminItem", "it", new { Id = Item.Id, UserId = Item.UserId })" class="btn btn-warning edit-link"><i class="fa-regular fa-pen-to-square"></i></a>
+
+                    </div>
+                </td>
+                <td>
+
+                    <div class="delete-wrapper">
+                        <a href="/it/DeleteItem/@Item.Id" class="btn btn-danger delete-link" style=" background-color:#9d0208; color: white;"><i class="fa-solid fa-trash-can"></i></a>
+
+                    </div>
+
+                </td>
+            </tr>
+            @if (Item.IsEditing)
+            {
+                <form class="form-group" method="post" onsubmit="return validateForm()" asp-action="EditAdminItem">
+                    <input type="hidden" name="Id" value="@Item.Id" />
+                    <input type="hidden" name="UserId" value="@Item.UserId" />
+                <tr>
+                    <td class="date-font">@Item.CreateDate.ToString("dd.MM.yyyy")</td>
+                    <td class="date-font">@Item.ModifiedDate.ToString("dd.MM.yyyy")</td>
+                    <td>
+                        <input type="text" id="Name" name="Name" value="@Item.Name" />
+                    </td>
+                    <td>
+                        <input type="text" id="Type" name="Type" value="@Item.Type" />
+                    </td>
+                    <td>
+                        <input type="number" id="Amount" name="Amount" value="@Item.Amount" />
+                    </td>
+                    <td>
+                        <input type="number" id="Price" name="Price" value="@Item.Price" />
+                    </td>
+                    <td>
+                        <input type="text" id="ShopName" name="ShopName" value="@Item.ShopName" />
+                    </td>
+                    <td>
+                        <input type="checkbox" id="isActiveCheckboxEdit_@Item.Id" name="IsActive" @(Item.IsActive ? "checked" : "") />
+                    </td>
+                    <td>
+                        <button type="submit" class="btn btn-success" style="background-color:#3f7d20; color: white;">
+                            <i class="fas fa-floppy-disk"></i>
+                        </button>
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-danger" style="background-color:#9d0208; color: white;" onclick="cancelEdit()">
+                            <i class="fas fa-xmark"></i>
+                        </button>
+                    </td>
+                </tr>
+                </form>
+            }
+            
+        }
+
+    </table>
+
+
+
+
+      
+
+    
+
+
+
+
+
+
+<script>
+    let sortByCreationDateAsc = true;
+    let sortByModifiedDateAsc = true;
+    let sortByNameAsc = true;
+    let sortByTypeAsc = true;
+    let sortByAmountAsc = true;
+    let sortByPriceAsc = true;
+    let sortByShopNameAsc = true;
+
+    function sortByCreationDate() {
+        sortTable(0, 'date', sortByCreationDateAsc);
+        sortByCreationDateAsc = !sortByCreationDateAsc;
+    }
+
+    function sortByModifiedDate() {
+        sortTable(1, 'date', sortByModifiedDateAsc);
+        sortByModifiedDateAsc = !sortByModifiedDateAsc;
+    }
+
+    function sortByName() {
+        sortTable(2, 'text', sortByNameAsc);
+        sortByNameAsc = !sortByNameAsc;
+    }
+
+    function sortByType() {
+        sortTable(3, 'text', sortByTypeAsc);
+        sortByTypeAsc = !sortByTypeAsc;
+    }
+
+    function sortByAmount() {
+        sortTable(4, 'number', sortByAmountAsc);
+        sortByAmountAsc = !sortByAmountAsc;
+    }
+
+    function sortByPrice() {
+        sortTable(5, 'number', sortByPriceAsc);
+        sortByPriceAsc = !sortByPriceAsc;
+    }
+
+    function sortByShopName() {
+        sortTable(6, 'text', sortByShopNameAsc);
+        sortByShopNameAsc = !sortByShopNameAsc;
+    }
+
+    function sortTable(columnIndex, dataType, sortAsc) {
+        const tableBody = document.querySelector('.table-t tbody');
+        const tableRows = Array.from(tableBody.querySelectorAll('tr'));
+        const headerRow = tableRows.shift();
+        const sortedRows = tableRows.sort((rowA, rowB) => {
+            const valueA = getValueFromRow(rowA, columnIndex, dataType);
+            const valueB = getValueFromRow(rowB, columnIndex, dataType);
+
+            if (dataType === 'text' || dataType === 'date') {
+                return sortAsc ? valueA.localeCompare(valueB) : valueB.localeCompare(valueA);
+            } else if (dataType === 'number') {
+                return sortAsc ? valueA - valueB : valueB - valueA;
+            }
+
+            return 0;
+        });
+
+
+        tableBody.innerHTML = '';
+        tableBody.appendChild(headerRow);
+
+
+        sortedRows.forEach(row => tableBody.appendChild(row));
+    }
+
+    function getValueFromRow(row, columnIndex, dataType) {
+        const cell = row.querySelector(`td:nth-child(${columnIndex + 1})`);
+        let value = cell ? cell.textContent.trim() : '';
+
+        if (dataType === 'number') {
+            value = parseFloat(value.replace(',', '.'));
+        } else if (dataType === 'date') {
+            const dateParts = value.split('.');
+            value = new Date(dateParts[2], dateParts[1] - 1, dateParts[0]);
+        }
+
+        return value;
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const deleteLinks = document.querySelectorAll(".delete-link");
+
+        deleteLinks.forEach(function (link) {
+            link.addEventListener("click", function (event) {
+                event.preventDefault();
+
+                const deleteUrl = this.getAttribute("href");
+
+                const swalWithBootstrapButtons = Swal.mixin({
+                    customClass: {
+                        confirmButton: 'btn btn-success',
+                        cancelButton: 'btn btn-danger'
+                    },
+                    buttonsStyling: false
+                });
+
+                swalWithBootstrapButtons.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, delete it!',
+                    cancelButtonText: 'No, cancel!',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        swalWithBootstrapButtons.fire(
+                            'Deleted!',
+                            'Your file has been deleted.',
+                            'success'
+                        );
+                        deleteItem(deleteUrl);
+                    } else if (result.dismiss === Swal.DismissReason.cancel) {
+                        swalWithBootstrapButtons.fire(
+                            'Cancelled',
+                            'Your file is safe :)',
+                            'error'
+                        );
+                    }
+                });
+            });
+        });
+
+        const tableRows = document.querySelectorAll("tr");
+        tableRows.forEach(function (row) {
+            const isActiveCheckbox = row.querySelector("input[type='checkbox'][disabled]");
+            if (isActiveCheckbox && !isActiveCheckbox.checked) {
+                row.classList.add("inactive-row");
+            }
+        });
+    });
+
+    function deleteItem(deleteUrl) {
+        fetch(deleteUrl, {
+            method: 'POST'
+        })
+            .then(response => {
+                if (response.ok) {
+                    window.location.reload();
+                } else {
+                    throw new Error('Deletion failed.');
+                }
+            })
+            .catch(error => {
+                console.error(error);
+                Swal.fire(
+                    'Error',
+                    'An error occurred during the deletion process.',
+                    'error'
+                );
+            });
+    }
+
+    function cancelEdit() {
+        window.location.reload();
+    }
+
+    function validateForm() {
+        var name = document.getElementById("Name").value;
+        var type = document.getElementById("Type").value;
+        var amount = parseFloat(document.getElementById("Amount").value);
+        var price = parseFloat(document.getElementById("Price").value);
+        var shopName = document.getElementById("ShopName").value;
+
+        if (!name || !type || isNaN(amount) || isNaN(price) || !shopName) {
+            Swal.fire('Please fill in all fields!');
+            return false;
+        }
+
+        return true;
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        searchByName();
+    });
+
+    function searchByName() {
+        var input, filter, table, tr, td, i, txtValue;
+        input = document.getElementById("search");
+        filter = input.value.toUpperCase();
+        table = document.getElementsByClassName("table-t")[0];
+        tr = table.getElementsByTagName("tr");
+        for (i = 1; i < tr.length; i++) { // Skip the header row (index 0)
+            td = tr[i].getElementsByTagName("td")[2]; // Name column (index 2)
+            if (td) {
+                txtValue = td.textContent || td.innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        searchByName();
+
+        // Number of lines (satır sayısı) seçildiğinde çalışacak fonksiyon
+        const pageSizeSelect = document.getElementById("pageSize");
+        pageSizeSelect.addEventListener("change", function () {
+            changePageSize();
+        });
+    });
+
+    // Diğer JavaScript kodları...
+
+    function changePageSize() {
+        const pageSizeSelect = document.getElementById("pageSize");
+        const selectedPageSize = parseInt(pageSizeSelect.value);
+
+        // Yeni sayfa boyutuna göre sayfalandırma yap
+        window.location.href = getUrlWithNewPageSize(selectedPageSize);
+    }
+
+    function getUrlWithNewPageSize(pageSize) {
+        const currentUrl = new URL(window.location.href);
+        currentUrl.searchParams.set("pageSize", pageSize);
+        return currentUrl.href;
+    }
+</script>

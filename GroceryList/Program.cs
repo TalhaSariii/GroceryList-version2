@@ -1,8 +1,8 @@
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
+using System;
 
 namespace GroceryList
 {
@@ -11,6 +11,9 @@ namespace GroceryList
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            // IConfiguration'ý alýn
+            var configuration = builder.Configuration;
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
@@ -26,8 +29,13 @@ namespace GroceryList
 
             var app = builder.Build();
 
+            // Yapýlandýrmalarý yapýn
+            var webHostEnvironment = app.Services.GetRequiredService<IWebHostEnvironment>();
+
+            var webRootPath = webHostEnvironment.WebRootPath;
+
             // Configure the HTTP request pipeline.
-            if (!app.Environment.IsDevelopment())
+            if (!webHostEnvironment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
@@ -42,7 +50,7 @@ namespace GroceryList
             // Session kullanýmýný etkinleþtirin
             app.UseSession();
 
-            app.UseAuthorization();
+            app.UseAuthentication();
 
             app.MapControllerRoute(
                 name: "default",
