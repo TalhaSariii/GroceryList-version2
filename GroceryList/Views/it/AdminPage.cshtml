@@ -56,6 +56,11 @@
         cursor: pointer;
         margin-right: 10px;
     }
+
+    .talha{
+        background-color: #8d99ae;
+        font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    }
 </style>
 
 <a href="/it/login" class="exit-logo">&#10006;</a>
@@ -63,23 +68,26 @@
     <h1>Admin Page</h1>
 </div>
 
+
 <div class="container">
     @foreach (var user in Model)
     {
-        <div class="user-box">
-            <div class="user-info">User ID: @user.UserId</div>
-            <div class="user-info">User Name: @user.UserName</div>
-            <button class="settings-btn" onclick="toggleOptions('@user.UserId')">
-                <i class="fa-solid fa-gear settings-icon"></i>
-            </button>
-            <div class="settings-options" id="options-@user.UserId">
-                <button onclick="location.href='@Url.Action("EditUser", "it", new { userId = user.UserId })'">Update</button>
-                <button onclick="showUserTable('@user.UserId')">Show User Table</button>
+        <div class="card user-card">
+            <div class="card-body talha">
+                
+                <h5 class="card-title">User ID: @user.UserId</h5>
+                <p class="card-text">User Name: @user.UserName</p>
+                <button class="settings-btn" onclick="toggleOptions('@user.UserId')">
+                    <i class="fa-solid fa-gear settings-icon"></i>
+                </button>
+                <div class="settings-options" id="options-@user.UserId">
+                    <button onclick="location.href='@Url.Action("EditUser", "it", new { userId = user.UserId })'">Update</button>
+                    <button onclick="showUserTable('@user.UserId')">Show User Table</button>
+                </div>
             </div>
         </div>
     }
 </div>
-
 <script>
     function toggleOptions(userId) {
         const optionsDiv = document.getElementById('options-' + userId);

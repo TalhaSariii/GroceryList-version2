@@ -9,6 +9,7 @@ using System.Globalization;
 using Microsoft.Extensions.Configuration;
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
+using BCrypt.Net;
 
 
 namespace GroceryList.Controllers
@@ -88,22 +89,25 @@ namespace GroceryList.Controllers
         [HttpPost]
         public IActionResult Register(Users newUser)
         {
-          
+            // Kullanıcı adının alınmadığından emin olun
             bool isUsernameTaken = c.Users.Any(u => u.UserName == newUser.UserName);
 
             if (isUsernameTaken)
             {
-               
-                TempData["ErrorMessage"] = "Username is already taken. Please choose a different username.";
+                TempData["ErrorMessage"] = "Bu kullanıcı adı zaten alınmış. Lütfen başka bir kullanıcı adı seçin.";
                 return RedirectToAction("Register");
             }
 
-        
+            // Şifreyi BCrypt ile hashleyin
+            string hashedPassword = BCrypt.Net.BCrypt.HashPassword(newUser.Password);
+            newUser.Password = hashedPassword;
+
             c.Users.Add(newUser);
             c.SaveChanges();
 
             int newUserId = newUser.UserId;
 
+            // Oturum yönetimini yapın (örneğin Session)
             HttpContext.Session.SetInt32("UserId", newUserId);
 
             return RedirectToAction("Index", new { userId = newUserId, success = "true" });
@@ -150,21 +154,27 @@ namespace GroceryList.Controllers
             if (IsAdminLogin(userName, password))
             {
                 HttpContext.Session.SetInt32("IsAdmin", 1);
-               
                 return RedirectToAction("AdminPage");
             }
 
-            var existingUser = c.Users.FirstOrDefault(x => x.UserName == userName && x.Password == password);
+          
+            var existingUser = c.Users.FirstOrDefault(x => x.UserName == userName);
+
             if (existingUser != null)
             {
-                HttpContext.Session.SetInt32("UserId", existingUser.UserId);
-                return RedirectToAction("Index", new { userId = existingUser.UserId, success = "true" });
+       
+                bool isPasswordCorrect = BCrypt.Net.BCrypt.Verify(password, existingUser.Password);
+
+                if (isPasswordCorrect)
+                {
+                   
+                    HttpContext.Session.SetInt32("UserId", existingUser.UserId);
+                    return RedirectToAction("Index", new { userId = existingUser.UserId, success = "true" });
+                }
             }
-            else
-            {
-               
-                return RedirectToAction("Login", new { success = "false" });
-            }
+
+        
+            return RedirectToAction("Login", new { success = "false" });
         }
 
 
@@ -250,8 +260,13 @@ namespace GroceryList.Controllers
             if (user != null)
             {
                 user.UserName = updatedUser.UserName;
-                user.Password = updatedUser.Password;
-              
+
+               
+                if (updatedUser.Password != null)
+                {
+                    user.Password = BCrypt.Net.BCrypt.HashPassword(updatedUser.Password);
+                }
+
                 c.SaveChanges();
             }
 
@@ -328,7 +343,7 @@ namespace GroceryList.Controllers
         {
             if (profilePicture != null && profilePicture.Length > 0)
             {
-                // Resim yükleme işlemi
+              
                 string uploadsFolder = Path.Combine(_webHostEnvironment.ContentRootPath, "wwwroot", "uploads");
                 string uniqueFileName = Guid.NewGuid().ToString() + "_" + profilePicture.FileName;
                 string filePath = Path.Combine(uploadsFolder, uniqueFileName);
@@ -338,10 +353,9 @@ namespace GroceryList.Controllers
                     profilePicture.CopyTo(fileStream);
                 }
 
-                // Resim yüklendikten sonra kullanıcının profil resmi URL'sini güncelleyin.
                 string profilePictureURL = "/uploads/" + uniqueFileName;
 
-                // Kullanıcının kimliğini (UserId) oturuma tekrar atayın
+          
                 var userId = HttpContext.Session.GetInt32("UserId");
                 if (userId.HasValue)
                 {
@@ -351,16 +365,16 @@ namespace GroceryList.Controllers
                         currentUser.ProfilePictureURL = profilePictureURL;
                         c.SaveChanges();
 
-                        // UserId'yi TempData ile taşıyın
+                     
                         TempData["UserId"] = userId.Value;
                     }
                 }
 
-                // Profil resmi güncellendiğinde, kullanıcıyı fotoğraf değiştirme sayfasına yönlendirin.
+              
                 return RedirectToAction("EditItem");
             }
 
-            // Eğer resim yüklenmemişse, hata durumunda veya başka durumlarda yine Index sayfasına yönlendirin.
+           
             return RedirectToAction("Index");
         }
 

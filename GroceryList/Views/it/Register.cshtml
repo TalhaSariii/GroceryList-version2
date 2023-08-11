@@ -80,7 +80,7 @@
 
     </style>
 
-    <title>Login Page</title>
+    <title>Sign Up </title>
     <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
@@ -88,7 +88,7 @@
 
     <div class="form-container sign-up-container">
         <form action="/it/Register" method="post">
-            <h1>Create Account</h1>
+            <h1>Sign Up</h1>
             <div class="alert-container">
                 @if (TempData["ErrorMessage"] != null)
                 {
@@ -98,9 +98,9 @@
                 }
             </div>
 
-            <input type="text" placeholder="UserName" name="Username" required />
+            <input type="text" placeholder="User Name" name="Username" required />
             <input type="password" placeholder="Password" name="password" required />
-            <button type="submit">Sign Up</button>
+            <button type="submit">Sign Up </button>
         </form>
     </div>
 
